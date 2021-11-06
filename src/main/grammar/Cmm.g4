@@ -7,6 +7,10 @@ cmmParser:
     EOF
 ;
 
+methodDeclaration:
+
+
+
 mainDeclaration:
     MAIN LPAR RPAR BEGIN NEWLINE
     functionBody
@@ -14,10 +18,10 @@ mainDeclaration:
     ;
 
 functionBody:
-((assignment | expression) (';' (assignment | expression))* ';'? |
+((assignment | expression | variableDeclaration) (';' (assignment | expression | variableDeclaration))* ';'? |
+    doWhileBlock |
     ifBlock |
     whileBlock |
-    doWhileBlock |
     return)*
     ;
 
@@ -26,11 +30,15 @@ return:
     ;
 
 singleFunctionBody:
-(assignment | expression) (';' (assignment | expression))* ';'? |
+(assignment | expression | variableDeclaration) (';' (assignment | expression | variableDeclaration))* ';'? |
     ifBlock |
     whileBlock |
     doWhileBlock |
     return
+    ;
+
+variableDeclaration:
+   variableType (IDENTIFIER | assignment) (',' (IDENTIFIER | assignment))*
     ;
 
 ifBlock:
@@ -85,7 +93,8 @@ expressionOperandAfterCond:
 
 expressionOperand:
   (LPAR expressionOperand RPAR)
-   | functionCall | NUM | TRUE | FALSE | IDENTIFIER | ((NEG | PLUS | MINUS) expressionOperand);
+   | functionCall | NUM | TRUE | FALSE | IDENTIFIER | ((NEG | PLUS | MINUS) expressionOperand)
+   ;
 
 functionCall:
     (IDENTIFIER | (IDENTIFIER DOT IDENTIFIER)) call
@@ -103,14 +112,9 @@ callArguments:
     expression (COMMA callArguments)?
 ;
 
-variableDeclaration:
-//    VarName = variableType IDENTIFIER ';'?
-//    { System.out.println("VarDec:" + $VarName.text); }
-;
-
-
 variableType:
-    INT | BOOL | LIST | STRUCT | FPTR;
+    INT | BOOL | LIST | STRUCT | FPTR
+    ;
 
 
 NUM: DIGIT+;

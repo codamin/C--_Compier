@@ -1,0 +1,21 @@
+
+structDeclaration:
+    STRUCT IDENTIFIER BEGIN NEWLINE
+    (variableDeclaration)*
+    NEWLINE END NEWLINE
+
+
+
+
+
+
+
+
+
+
+
+
+STRUCT: 'struct';
+
+variableDeclarationSingle:
+    

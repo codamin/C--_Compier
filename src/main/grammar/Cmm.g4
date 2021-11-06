@@ -8,12 +8,18 @@ cmmParser:
 ;
 
 methodDeclaration:
+    (variableType | VOID) IDENTIFIER LPAR arguments? RPAR BEGIN
+        functionBody
+    END
+   ;
 
-
+arguments:
+   (variableType (IDENTIFIER)) (',' variableType (IDENTIFIER))*
+   ;
 
 mainDeclaration:
     MAIN LPAR RPAR BEGIN NEWLINE
-    functionBody
+        functionBody
     NEWLINE END NEWLINE
     ;
 
@@ -65,7 +71,6 @@ doWhileBlock:
     NEWLINE
     END WHILE expression
     ;
-
 
 assignment:
     IDENTIFIER ASSIGN expression

@@ -1,15 +1,34 @@
 grammar Cmm;
 
 cmmParser:
-//    structDeclaration*
+    structDeclaration*
     methodDeclaration*
     mainDeclaration
     EOF
 ;
 
+structDeclaration:
+    STRUCT IDENTIFIER BEGIN NEWLINE
+    structBody
+    NEWLINE END NEWLINE
+    ;
+
+structBody:
+    ((variableDeclaration (';' variableDeclaration)* ';'?) |
+    structVariableDeclarationGetSet)*
+    ;
+
+
+structVariableDeclarationGetSet:
+    variableType IDENTIFIER LPAR arguments? RPAR BEGIN NEWLINE
+    SET functionBody
+    GET functionBody
+    NEWLINE END NEWLINE
+    ;
+
 methodDeclaration:
     (variableType | VOID) IDENTIFIER LPAR arguments? RPAR BEGIN
-        functionBody
+        multiFunctionBody
     END
    ;
 
@@ -19,20 +38,25 @@ arguments:
 
 mainDeclaration:
     MAIN LPAR RPAR BEGIN NEWLINE
-        functionBody
+        multiFunctionBody
     NEWLINE END NEWLINE
     ;
 
 functionBody:
-((assignment | expression | variableDeclaration) (';' (assignment | expression | variableDeclaration))* ';'? |
+   ((BEGIN NEWLINE multiFunctionBody NEWLINE END NEWLINE) | singleFunctionBody)
+   ;
+
+multiFunctionBody:
+    ((assignment | expression | variableDeclaration)
+     (';' (assignment | expression | variableDeclaration))* ';'? |
     doWhileBlock |
     ifBlock |
     whileBlock |
-    return)*
+    returnStmt)*
     ;
 
-return:
-    (RETURN expression?)
+returnStmt:
+    RETURN expression?
     ;
 
 singleFunctionBody:
@@ -40,36 +64,33 @@ singleFunctionBody:
     ifBlock |
     whileBlock |
     doWhileBlock |
-    return
+    returnStmt
     ;
 
 variableDeclaration:
-   variableType (IDENTIFIER | assignment) (',' (IDENTIFIER | assignment))*
+   (variableType (IDENTIFIER | assignment) (',' (IDENTIFIER | assignment))*)
     ;
 
 ifBlock:
     IF expression
-       (BEGIN NEWLINE functionBody NEWLINE END NEWLINE | singleFunctionBody)
-
+       functionBody
     elseBlock?
     ;
 
 elseBlock:
     ELSE
-       (BEGIN NEWLINE functionBody NEWLINE END NEWLINE | singleFunctionBody)
+      functionBody
     ;
-
 
 whileBlock:
     WHILE expression
-           (BEGIN NEWLINE functionBody NEWLINE END NEWLINE | singleFunctionBody)
+       functionBody
     ;
 
 doWhileBlock:
-    DO BEGIN NEWLINE
+    DO
     functionBody
-    NEWLINE
-    END WHILE expression
+    WHILE expression
     ;
 
 assignment:
@@ -102,25 +123,29 @@ expressionOperand:
    ;
 
 functionCall:
-    (IDENTIFIER | (IDENTIFIER DOT IDENTIFIER)) call
+    IDENTIFIER call
     ;
-
-//nestedCall:
-//    (DOT IDENTIFIER | LPAR arithmeticStatement RPAR) call?
-//    ;
 
 call:
     LPAR callArguments? RPAR call?
     ;
 
 callArguments:
-    expression (COMMA callArguments)?
+    expression (COMMA expression)*
 ;
 
-variableType:
-    INT | BOOL | LIST | STRUCT | FPTR
+primitiveFunctions:
+    ((DISPLAY | SIZE) LPAR IDENTIFIER RPAR) | (APPEND LPAR IDENTIFIER COMMA IDENTIFIER RPAR)
+;
+
+fptrVarTypes:
+    INT | BOOL | (STRUCT IDENTIFIER) | (LIST SHARP (LIST SHARP)* variableType)
     ;
 
+variableType:
+    fptrVarTypes |
+    (FPTR LT ((fptrVarTypes (COMMA fptrVarTypes)*) | VOID) '->' (fptrVarTypes | VOID) GT)
+    ;
 
 NUM: DIGIT+;
 
@@ -145,6 +170,7 @@ NEG: '~';
 
 LPAR: '(';
 RPAR: ')';
+SHARP: '#';
 NEWLINE: '\n' | '\r';
 
 // Keywords
@@ -179,7 +205,7 @@ FPTR: 'fptr';
 
 IDENTIFIER: ALPHA (ALPHA | DIGIT)*;
 
-WS: [ \t\r]+ -> skip;
+WS: [ \t\r\n]+ -> skip;
 COMMENT: '/*' * '*/' -> skip;
 fragment DIGIT: [0-9];
 fragment ALPHA: [a-zA-Z_];

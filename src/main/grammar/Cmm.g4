@@ -8,9 +8,9 @@ cmmParser:
 ;
 
 structDeclaration:
-    STRUCT IDENTIFIER BEGIN NEWLINE
+    STRUCT IDENTIFIER BEGIN
     structBody
-    NEWLINE END NEWLINE
+    END
     ;
 
 structBody:
@@ -20,16 +20,15 @@ structBody:
 
 
 structVariableDeclarationGetSet:
-    variableType IDENTIFIER LPAR arguments? RPAR BEGIN NEWLINE
+    variableType IDENTIFIER LPAR arguments? RPAR BEGIN
     SET functionBody
     GET functionBody
-    NEWLINE END NEWLINE
+    END
     ;
 
 methodDeclaration:
-    (variableType | VOID) IDENTIFIER LPAR arguments? RPAR BEGIN
-        multiFunctionBody
-    END
+    (variableType | VOID) IDENTIFIER LPAR arguments? RPAR
+        functionBody
    ;
 
 arguments:
@@ -37,13 +36,12 @@ arguments:
    ;
 
 mainDeclaration:
-    MAIN LPAR RPAR BEGIN NEWLINE
+    MAIN LPAR RPAR
         multiFunctionBody
-    NEWLINE END NEWLINE
     ;
 
 functionBody:
-   ((BEGIN NEWLINE multiFunctionBody NEWLINE END NEWLINE) | singleFunctionBody)
+   ((BEGIN multiFunctionBody END) | singleFunctionBody)
    ;
 
 multiFunctionBody:
@@ -97,28 +95,29 @@ assignment:
     IDENTIFIER ASSIGN expression
     ;
 
+
 expression:
-    (LPAR expression RPAR) |
+    ((NEG | PLUS | MINUS)? LPAR expression RPAR) |
      expressionOperandAfterPlusMinus ((PLUS | MINUS) expressionOperandAfterPlusMinus)*
      ;
 
 expressionOperandAfterPlusMinus:
-    (LPAR expressionOperandAfterPlusMinus RPAR) |
+    ((NEG | PLUS | MINUS)? LPAR expressionOperandAfterPlusMinus RPAR) |
      expressionOperandAfterMultDiv ((MULT | DIVIDE) expressionOperandAfterMultDiv)*
      ;
 
 expressionOperandAfterMultDiv:
-    (LPAR expressionOperandAfterMultDiv RPAR) |
+    ((NEG | PLUS | MINUS)? LPAR expressionOperandAfterMultDiv RPAR) |
      expressionOperandAfterCond ((EQ | LT | GT) expressionOperandAfterCond)*
     ;
 
 expressionOperandAfterCond:
-    (LPAR expressionOperandAfterCond RPAR) |
+    ((NEG | PLUS | MINUS)? LPAR expressionOperandAfterCond RPAR) |
      expressionOperand ((AND | OR) expressionOperand)*
     ;
 
 expressionOperand:
-  (LPAR expressionOperand RPAR)
+  ((NEG | PLUS | MINUS)? LPAR expressionOperand RPAR)
    | functionCall | NUM | TRUE | FALSE | IDENTIFIER | ((NEG | PLUS | MINUS) expressionOperand)
    ;
 

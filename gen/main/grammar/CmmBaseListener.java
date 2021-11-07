@@ -136,13 +136,13 @@ public class CmmBaseListener implements CmmListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSinglemultiFunctionBody(CmmParser.SinglemultiFunctionBodyContext ctx) { }
+	@Override public void enterSingleFunctionBody(CmmParser.SingleFunctionBodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSinglemultiFunctionBody(CmmParser.SinglemultiFunctionBodyContext ctx) { }
+	@Override public void exitSingleFunctionBody(CmmParser.SingleFunctionBodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

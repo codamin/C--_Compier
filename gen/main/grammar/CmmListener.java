@@ -108,15 +108,15 @@ public interface CmmListener extends ParseTreeListener {
 	 */
 	void exitReturnStmt(CmmParser.ReturnStmtContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link CmmParser#singlemultiFunctionBody}.
+	 * Enter a parse tree produced by {@link CmmParser#singleFunctionBody}.
 	 * @param ctx the parse tree
 	 */
-	void enterSinglemultiFunctionBody(CmmParser.SinglemultiFunctionBodyContext ctx);
+	void enterSingleFunctionBody(CmmParser.SingleFunctionBodyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link CmmParser#singlemultiFunctionBody}.
+	 * Exit a parse tree produced by {@link CmmParser#singleFunctionBody}.
 	 * @param ctx the parse tree
 	 */
-	void exitSinglemultiFunctionBody(CmmParser.SinglemultiFunctionBodyContext ctx);
+	void exitSingleFunctionBody(CmmParser.SingleFunctionBodyContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CmmParser#variableDeclaration}.
 	 * @param ctx the parse tree

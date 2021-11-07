@@ -71,11 +71,11 @@ public interface CmmVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReturnStmt(CmmParser.ReturnStmtContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link CmmParser#singlemultiFunctionBody}.
+	 * Visit a parse tree produced by {@link CmmParser#singleFunctionBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSinglemultiFunctionBody(CmmParser.SinglemultiFunctionBodyContext ctx);
+	T visitSingleFunctionBody(CmmParser.SingleFunctionBodyContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link CmmParser#variableDeclaration}.
 	 * @param ctx the parse tree

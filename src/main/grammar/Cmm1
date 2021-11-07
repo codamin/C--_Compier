@@ -1,19 +1,1 @@
 
-structDeclaration:
-    STRUCT IDENTIFIER BEGIN NEWLINE
-    (variableDeclaration)*
-    NEWLINE END NEWLINE
-    ;
-
-structBody:
-    ((assignment | expression | variableDeclaration) (';' (assignment | expression | variableDeclaration))* ';'? |
-    structVariableDeclarationGetSet
-    )*
-    ;
-
-structVariableDeclarationGetSet:
-    variableType IDENTIFIER LPAR arguments? RPAR BEGIN NEWLINE
-    SET ((BEGIN NEWLINE functionBody NEWLINE END NEWLINE) | singleFunctionBody)
-    GET ((BEGIN NEWLINE functionBody NEWLINE END NEWLINE) | singleFunctionBody)
-    NEWLINE END NEWLINE
-    ;

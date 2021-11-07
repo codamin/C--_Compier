@@ -24,7 +24,7 @@ structVariableDeclarationGetSet:
     variableType (VariableName = IDENTIFIER {System.out.println("VarDec : " + $VariableName.text);}) LPAR arguments? RPAR BEGIN NEWLINE+
     SET {System.out.println("Setter");} functionBody NEWLINE*
     GET {System.out.println("Getter");} functionBody
-    NEWLINE+ END NEWLINE+
+    NEWLINE+ END NEWLINE*
     ;
 
 methodDeclaration:
@@ -40,11 +40,11 @@ arguments:
 mainDeclaration:
     MAIN {System.out.println("Main");} LPAR RPAR BEGIN NEWLINE+
         multiFunctionBody
-    NEWLINE+ END
+    NEWLINE+ END NEWLINE+
     ;
 
 functionBody:
-   ((BEGIN NEWLINE+ multiFunctionBody NEWLINE+ END NEWLINE+) | singleFunctionBody)
+   ((BEGIN NEWLINE+ multiFunctionBody NEWLINE+ END NEWLINE*) | singleFunctionBody)
    ;
 
 multiFunctionBody:
@@ -151,7 +151,7 @@ callArguments:
 ;
 
 primitiveFunctions:
-    (DISPLAY {System.out.println("Built-in: display");} LPAR expression RPAR) |
+    (DISPLAY {System.out.println("Built-in : display");} LPAR expression RPAR) |
     (SIZE {System.out.println("Size");} LPAR expression RPAR) |
     (APPEND {System.out.println("Append");} LPAR nestedIdentifier COMMA expression RPAR)
 ;

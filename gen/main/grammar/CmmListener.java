@@ -178,6 +178,16 @@ public interface CmmListener extends ParseTreeListener {
 	 */
 	void exitAssignment(CmmParser.AssignmentContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CmmParser#expresionFunctionCall}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpresionFunctionCall(CmmParser.ExpresionFunctionCallContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CmmParser#expresionFunctionCall}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpresionFunctionCall(CmmParser.ExpresionFunctionCallContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CmmParser#expression}.
 	 * @param ctx the parse tree
 	 */
@@ -187,6 +197,16 @@ public interface CmmListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpression(CmmParser.ExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CmmParser#expressionOperandAfterAndOr}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpressionOperandAfterAndOr(CmmParser.ExpressionOperandAfterAndOrContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CmmParser#expressionOperandAfterAndOr}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpressionOperandAfterAndOr(CmmParser.ExpressionOperandAfterAndOrContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CmmParser#expressionOperandAfterPlusMinus}.
 	 * @param ctx the parse tree
@@ -207,16 +227,6 @@ public interface CmmListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpressionOperandAfterMultDiv(CmmParser.ExpressionOperandAfterMultDivContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link CmmParser#expressionOperandAfterCond}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpressionOperandAfterCond(CmmParser.ExpressionOperandAfterCondContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link CmmParser#expressionOperandAfterCond}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpressionOperandAfterCond(CmmParser.ExpressionOperandAfterCondContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CmmParser#expressionOperand}.
 	 * @param ctx the parse tree

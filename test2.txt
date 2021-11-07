@@ -9,7 +9,7 @@ struct S1 begin
     end
 end
 
-fptr <int -> int>    f1(int arg1, bool arg1, list# list# struct S1 arg2) begin
+fptr <int -> int> f1(int arg1, bool arg1, list# list# struct S1 arg2) begin
     fptr <void -> void> ptr1 = f1; return ptr1;
 end
 
@@ -18,7 +18,7 @@ int sample()
         if ~(a&b)
             return append(li, 8*9/func());
         else
-            return -size(li) + - n;
+            return -size(li) + a - n;
 
 main() begin
     f1()();

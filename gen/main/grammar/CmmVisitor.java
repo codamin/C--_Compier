@@ -113,11 +113,23 @@ public interface CmmVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAssignment(CmmParser.AssignmentContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link CmmParser#expresionFunctionCall}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpresionFunctionCall(CmmParser.ExpresionFunctionCallContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link CmmParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitExpression(CmmParser.ExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CmmParser#expressionOperandAfterAndOr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpressionOperandAfterAndOr(CmmParser.ExpressionOperandAfterAndOrContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link CmmParser#expressionOperandAfterPlusMinus}.
 	 * @param ctx the parse tree
@@ -130,12 +142,6 @@ public interface CmmVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExpressionOperandAfterMultDiv(CmmParser.ExpressionOperandAfterMultDivContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link CmmParser#expressionOperandAfterCond}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpressionOperandAfterCond(CmmParser.ExpressionOperandAfterCondContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link CmmParser#expressionOperand}.
 	 * @param ctx the parse tree

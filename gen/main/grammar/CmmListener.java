@@ -1,4 +1,4 @@
-// Generated from /home/amin/Desktop/compiler/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
+// Generated from /home/ho/C--_Compier/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
 package main.grammar;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -228,6 +228,16 @@ public interface CmmListener extends ParseTreeListener {
 	 */
 	void exitExpressionOperand(CmmParser.ExpressionOperandContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CmmParser#index}.
+	 * @param ctx the parse tree
+	 */
+	void enterIndex(CmmParser.IndexContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CmmParser#index}.
+	 * @param ctx the parse tree
+	 */
+	void exitIndex(CmmParser.IndexContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CmmParser#functionCall}.
 	 * @param ctx the parse tree
 	 */
@@ -267,6 +277,16 @@ public interface CmmListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPrimitiveFunctions(CmmParser.PrimitiveFunctionsContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CmmParser#nestedIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterNestedIdentifier(CmmParser.NestedIdentifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CmmParser#nestedIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitNestedIdentifier(CmmParser.NestedIdentifierContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CmmParser#fptrVarTypes}.
 	 * @param ctx the parse tree

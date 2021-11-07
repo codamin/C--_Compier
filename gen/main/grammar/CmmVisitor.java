@@ -1,4 +1,4 @@
-// Generated from /home/amin/Desktop/compiler/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
+// Generated from /home/ho/C--_Compier/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
 package main.grammar;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -143,6 +143,12 @@ public interface CmmVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpressionOperand(CmmParser.ExpressionOperandContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link CmmParser#index}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIndex(CmmParser.IndexContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link CmmParser#functionCall}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -166,6 +172,12 @@ public interface CmmVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPrimitiveFunctions(CmmParser.PrimitiveFunctionsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CmmParser#nestedIdentifier}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNestedIdentifier(CmmParser.NestedIdentifierContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link CmmParser#fptrVarTypes}.
 	 * @param ctx the parse tree

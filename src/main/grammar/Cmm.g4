@@ -1,29 +1,30 @@
 grammar Cmm;
 
 cmmParser:
-    structDeclaration*
-    methodDeclaration*
-    mainDeclaration
+    NEWLINE*
+    structDeclaration* NEWLINE*
+    methodDeclaration* NEWLINE*
+    mainDeclaration NEWLINE*
     EOF
 ;
 
 structDeclaration:
-    STRUCT IDENTIFIER BEGIN
+    STRUCT StructName = IDENTIFIER {System.out.println("StructDec : " + $StructName.text);} BEGIN NEWLINE+
     structBody
-    END
+     NEWLINE+ END NEWLINE+
     ;
 
 structBody:
-    ((variableDeclaration (';' variableDeclaration)* ';'?) |
+    ((variableDeclaration (';' variableDeclaration)* ';'?) | NEWLINE |
     structVariableDeclarationGetSet)*
     ;
 
 
 structVariableDeclarationGetSet:
-    variableType IDENTIFIER LPAR arguments? RPAR BEGIN
-    SET functionBody
-    GET functionBody
-    END
+    variableType IDENTIFIER LPAR arguments? RPAR BEGIN NEWLINE+
+    SET {System.out.println("Setter");} functionBody NEWLINE*
+    GET {System.out.println("Getter");} functionBody
+    NEWLINE+ END NEWLINE+
     ;
 
 methodDeclaration:
@@ -36,21 +37,21 @@ arguments:
    ;
 
 mainDeclaration:
-    MAIN LPAR RPAR
+    MAIN LPAR RPAR BEGIN NEWLINE+
         multiFunctionBody
+    NEWLINE+ END
     ;
 
 functionBody:
-   ((BEGIN multiFunctionBody END) | singleFunctionBody)
+   ((BEGIN NEWLINE+ multiFunctionBody NEWLINE+ END NEWLINE+) | singleFunctionBody)
    ;
 
 multiFunctionBody:
-    ((assignment | expression | variableDeclaration)
-     (';' (assignment | expression | variableDeclaration))* ';'? |
+    ((assignment | expression | variableDeclaration | returnStmt)
+     (';' (assignment | expression | variableDeclaration | returnStmt))* ';'? | NEWLINE |
     doWhileBlock |
     ifBlock |
-    whileBlock |
-    returnStmt)*
+    whileBlock)*
     ;
 
 returnStmt:
@@ -58,11 +59,11 @@ returnStmt:
     ;
 
 singleFunctionBody:
-(assignment | expression | variableDeclaration) (';' (assignment | expression | variableDeclaration))* ';'? |
+NEWLINE*
+((assignment | expression | variableDeclaration | returnStmt) (';' (assignment | expression | variableDeclaration | returnStmt))* ';'? |
     ifBlock |
     whileBlock |
-    doWhileBlock |
-    returnStmt
+    doWhileBlock) NEWLINE*
     ;
 
 variableDeclaration:
@@ -92,7 +93,7 @@ doWhileBlock:
     ;
 
 assignment:
-    IDENTIFIER ASSIGN expression
+    nestedIdentifier ASSIGN expression
     ;
 
 
@@ -117,12 +118,16 @@ expressionOperandAfterCond:
     ;
 
 expressionOperand:
-  ((NEG | PLUS | MINUS)? LPAR expressionOperand RPAR)
-   | functionCall | NUM | TRUE | FALSE | IDENTIFIER | ((NEG | PLUS | MINUS) expressionOperand)
+  ((NEG | PLUS | MINUS)? LPAR expressionOperand RPAR) | (((LPAR expression RPAR) | functionCall | nestedIdentifier) index) |
+  functionCall | NUM | TRUE | FALSE | nestedIdentifier | ((NEG | PLUS | MINUS) expressionOperand)
    ;
 
+index:
+    (LBRACKET NUM RBRACKET)+
+    ;
+
 functionCall:
-    IDENTIFIER call
+    primitiveFunctions | (nestedIdentifier call)
     ;
 
 call:
@@ -134,8 +139,10 @@ callArguments:
 ;
 
 primitiveFunctions:
-    ((DISPLAY | SIZE) LPAR IDENTIFIER RPAR) | (APPEND LPAR IDENTIFIER COMMA IDENTIFIER RPAR)
+    ((DISPLAY | SIZE) LPAR expression RPAR) | (APPEND LPAR nestedIdentifier COMMA expression RPAR)
 ;
+
+nestedIdentifier: IDENTIFIER (DOT IDENTIFIER)* (LBRACKET expression RBRACKET)*;
 
 fptrVarTypes:
     INT | BOOL | (STRUCT IDENTIFIER) | (LIST SHARP (LIST SHARP)* variableType)
@@ -169,8 +176,10 @@ NEG: '~';
 
 LPAR: '(';
 RPAR: ')';
+LBRACKET: '[';
+RBRACKET: ']';
 SHARP: '#';
-NEWLINE: '\n' | '\r';
+NEWLINE: '\n';
 
 // Keywords
 INT: 'int';
@@ -204,7 +213,16 @@ FPTR: 'fptr';
 
 IDENTIFIER: ALPHA (ALPHA | DIGIT)*;
 
-WS: [ \t\r\n]+ -> skip;
+//WS: WHITESPACE -> skip;
+//WS: (' ' | '\n' | '\r' | '\t')+ -> skip;
+//WS: [ \n\t\r]+ -> channel(HIDDEN);
+//WS : (' ' | '\t' | '\n' | '\r')+
+//     {$channel = HIDDEN;}
+//   ;
+//WHITESPACE:( '\t' | ' ' | '\r' | '\n'| '\u000C' ) + { $channel=HIDDEN;};
 COMMENT: '/*' * '*/' -> skip;
 fragment DIGIT: [0-9];
 fragment ALPHA: [a-zA-Z_];
+
+WS: [ \t\r]+ -> skip;
+//WS: (' '|'\n'|'\r'|'\t')+ -> skip;

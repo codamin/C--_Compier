@@ -21,23 +21,24 @@ structBody:
 
 
 structVariableDeclarationGetSet:
-    variableType IDENTIFIER LPAR arguments? RPAR BEGIN NEWLINE+
+    variableType (VariableName = IDENTIFIER {System.out.println("VarDec : " + $VariableName.text);}) LPAR arguments? RPAR BEGIN NEWLINE+
     SET {System.out.println("Setter");} functionBody NEWLINE*
     GET {System.out.println("Getter");} functionBody
     NEWLINE+ END NEWLINE+
     ;
 
 methodDeclaration:
-    (variableType | VOID) IDENTIFIER LPAR arguments? RPAR
+    (variableType | VOID) FunctionName = IDENTIFIER {System.out.println("FunctionDec : " + $FunctionName.text);} LPAR arguments? RPAR
         functionBody
    ;
 
 arguments:
-   (variableType (IDENTIFIER)) (',' variableType (IDENTIFIER))*
+   (variableType (ArgumentName = IDENTIFIER {System.out.println("ArgumentDec : " + $ArgumentName.text);}))
+   (',' variableType (ArgumentName = IDENTIFIER {System.out.println("ArgumentDec : " + $ArgumentName.text);}))*
    ;
 
 mainDeclaration:
-    MAIN LPAR RPAR BEGIN NEWLINE+
+    MAIN {System.out.println("Main");} LPAR RPAR BEGIN NEWLINE+
         multiFunctionBody
     NEWLINE+ END
     ;
@@ -55,39 +56,40 @@ multiFunctionBody:
     ;
 
 returnStmt:
-    RETURN expression?
+    RETURN {System.out.println("Return");} expression?
     ;
 
 singleFunctionBody:
 NEWLINE*
-((assignment | expression | variableDeclaration | returnStmt) (';' (assignment | expression | variableDeclaration | returnStmt))* ';'? |
+((assignment | expression | variableDeclaration | returnStmt) (';' (assignment | expression | variableDeclaration | returnStmt))* SEMICOLLON? |
     ifBlock |
     whileBlock |
     doWhileBlock) NEWLINE*
     ;
 
 variableDeclaration:
-   (variableType (IDENTIFIER | assignment) (',' (IDENTIFIER | assignment))*)
+   (variableType ((VariableName = IDENTIFIER {System.out.println("VarDec : " + $VariableName.text);}) (ASSIGN expression)?)
+   (',' ((VariableName = IDENTIFIER {System.out.println("VarDec : " + $VariableName.text);}) (ASSIGN expression)?))*) SEMICOLLON?
     ;
 
 ifBlock:
-    IF expression
+    IF {System.out.println("Conditional : if");} expression
        functionBody
     elseBlock?
     ;
 
 elseBlock:
-    ELSE
+    ELSE {System.out.println("Conditional : else");}
       functionBody
     ;
 
 whileBlock:
-    WHILE expression
+    WHILE {System.out.println("Loop : while");} expression
        functionBody
     ;
 
 doWhileBlock:
-    DO
+    DO {System.out.println("Loop : do...while");}
     functionBody
     WHILE expression
     ;
@@ -98,23 +100,23 @@ assignment:
 
 
 expression:
-    ((NEG | PLUS | MINUS)? LPAR expression RPAR) |
-     expressionOperandAfterPlusMinus ((PLUS | MINUS) expressionOperandAfterPlusMinus)*
+    (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {System.out.println("Operator : " + $Operator.text);}) |
+     expressionOperandAfterPlusMinus (((Operator = PLUS) | (Operator = MINUS)) expressionOperandAfterPlusMinus {System.out.println("Operator : " + $Operator.text);})*
      ;
 
 expressionOperandAfterPlusMinus:
     ((NEG | PLUS | MINUS)? LPAR expressionOperandAfterPlusMinus RPAR) |
-     expressionOperandAfterMultDiv ((MULT | DIVIDE) expressionOperandAfterMultDiv)*
+     expressionOperandAfterMultDiv (((Operator = MULT) | (Operator = DIVIDE)) expressionOperandAfterMultDiv {System.out.println("Operator : " + $Operator.text);})*
      ;
 
 expressionOperandAfterMultDiv:
     ((NEG | PLUS | MINUS)? LPAR expressionOperandAfterMultDiv RPAR) |
-     expressionOperandAfterCond ((EQ | LT | GT) expressionOperandAfterCond)*
+     expressionOperandAfterCond (((Operator = EQ) | (Operator = LT) | (Operator = GT)) expressionOperandAfterCond {System.out.println("Operator : " + $Operator.text);})*
     ;
 
 expressionOperandAfterCond:
     ((NEG | PLUS | MINUS)? LPAR expressionOperandAfterCond RPAR) |
-     expressionOperand ((AND | OR) expressionOperand)*
+     expressionOperand (((Operator = AND) | (Operator = OR)) expressionOperand {System.out.println("Operator : " + $Operator.text);} )*
     ;
 
 expressionOperand:
@@ -139,7 +141,9 @@ callArguments:
 ;
 
 primitiveFunctions:
-    ((DISPLAY | SIZE) LPAR expression RPAR) | (APPEND LPAR nestedIdentifier COMMA expression RPAR)
+    (DISPLAY {System.out.println("Built-in: display");} LPAR expression RPAR) |
+    (SIZE {System.out.println("Size");} LPAR expression RPAR) |
+    (APPEND {System.out.println("Append");} LPAR nestedIdentifier COMMA expression RPAR)
 ;
 
 nestedIdentifier: IDENTIFIER (DOT IDENTIFIER)* (LBRACKET expression RBRACKET)*;
@@ -162,6 +166,7 @@ MULT: '*';
 DIVIDE: '/';
 
 COMMA: ',';
+SEMICOLLON: ';';
 DOT: '.';
 
 GT: '>';

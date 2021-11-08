@@ -1,3 +1,0 @@
-main() begin
-int a = 2
-end

@@ -9,14 +9,12 @@ cmmParser:
 ;
 
 structDeclaration:
-    STRUCT StructName = IDENTIFIER {System.out.println("StructDec : " + $StructName.text);} BEGIN NEWLINE+
-    structBody
-     NEWLINE+ END NEWLINE+
+    STRUCT StructName = IDENTIFIER {System.out.println("StructDec : " + $StructName.text);}
+    ((BEGIN NEWLINE+ structBody NEWLINE+ END NEWLINE+) | (NEWLINE* structBody NEWLINE*))
     ;
 
 structBody:
-    ((variableDeclaration (';' variableDeclaration)* ';'?) | NEWLINE |
-    structVariableDeclarationGetSet)*
+    (((variableDeclaration | structVariableDeclarationGetSet) (';' variableDeclaration | structVariableDeclarationGetSet)* ';'?) | NEWLINE)*
     ;
 
 
@@ -40,7 +38,7 @@ arguments:
 mainDeclaration:
     MAIN {System.out.println("Main");} LPAR RPAR BEGIN NEWLINE+
         multiFunctionBody
-    NEWLINE+ END NEWLINE+
+    NEWLINE+ END NEWLINE*
     ;
 
 functionBody:
@@ -48,11 +46,9 @@ functionBody:
    ;
 
 multiFunctionBody:
-    ((assignment | expresionFunctionCall | variableDeclaration | returnStmt)
-     (';' (assignment | expresionFunctionCall | variableDeclaration | returnStmt))* ';'? | NEWLINE |
-    doWhileBlock |
-    ifBlock |
-    whileBlock)*
+    (
+    (assignment | expresionFunctionCall | variableDeclaration | returnStmt | ifBlock | doWhileBlock | whileBlock)
+    (SEMICOLLON (assignment | expresionFunctionCall | variableDeclaration | returnStmt | ifBlock | doWhileBlock | whileBlock))* SEMICOLLON? | NEWLINE)*
     ;
 
 returnStmt:
@@ -61,10 +57,8 @@ returnStmt:
 
 singleFunctionBody:
 NEWLINE*
-((assignment | expresionFunctionCall | variableDeclaration | returnStmt) (';' (assignment | expresionFunctionCall | variableDeclaration | returnStmt))* SEMICOLLON? |
-    ifBlock |
-    whileBlock |
-    doWhileBlock) NEWLINE*
+((assignment | expresionFunctionCall | variableDeclaration | returnStmt  | ifBlock | whileBlock | doWhileBlock)
+ (SEMICOLLON (assignment | expresionFunctionCall | variableDeclaration | returnStmt | ifBlock | whileBlock | doWhileBlock))* SEMICOLLON?) NEWLINE*
     ;
 
 variableDeclaration:
@@ -235,9 +229,9 @@ IDENTIFIER: ALPHA (ALPHA | DIGIT)*;
 //     {$channel = HIDDEN;}
 //   ;
 //WHITESPACE:( '\t' | ' ' | '\r' | '\n'| '\u000C' ) + { $channel=HIDDEN;};
-COMMENT: '/*' * '*/' -> skip;
+WS: [ \t\r]+ -> skip;
+COMMENT: '/*' .*? '*/' -> skip;
 fragment DIGIT: [0-9];
 fragment ALPHA: [a-zA-Z_];
 
-WS: [ \t\r]+ -> skip;
 //WS: (' '|'\n'|'\r'|'\t')+ -> skip;

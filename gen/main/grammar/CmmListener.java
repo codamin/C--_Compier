@@ -1,4 +1,4 @@
-// Generated from /home/amin/Desktop/compiler/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
+// Generated from /home/ho/C--_Compier/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
 package main.grammar;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -198,6 +198,16 @@ public interface CmmListener extends ParseTreeListener {
 	 */
 	void exitExpression(CmmParser.ExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CmmParser#expressionOperandAfterOr}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpressionOperandAfterOr(CmmParser.ExpressionOperandAfterOrContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CmmParser#expressionOperandAfterOr}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpressionOperandAfterOr(CmmParser.ExpressionOperandAfterOrContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CmmParser#expressionOperandAfterAndOr}.
 	 * @param ctx the parse tree
 	 */
@@ -208,6 +218,26 @@ public interface CmmListener extends ParseTreeListener {
 	 */
 	void exitExpressionOperandAfterAndOr(CmmParser.ExpressionOperandAfterAndOrContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CmmParser#expressionOperandAfterEq}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpressionOperandAfterEq(CmmParser.ExpressionOperandAfterEqContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CmmParser#expressionOperandAfterEq}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpressionOperandAfterEq(CmmParser.ExpressionOperandAfterEqContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CmmParser#expressionOperandAfterLtGt}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpressionOperandAfterLtGt(CmmParser.ExpressionOperandAfterLtGtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CmmParser#expressionOperandAfterLtGt}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpressionOperandAfterLtGt(CmmParser.ExpressionOperandAfterLtGtContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CmmParser#expressionOperandAfterPlusMinus}.
 	 * @param ctx the parse tree
 	 */
@@ -217,16 +247,6 @@ public interface CmmListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpressionOperandAfterPlusMinus(CmmParser.ExpressionOperandAfterPlusMinusContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link CmmParser#expressionOperandAfterMultDiv}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpressionOperandAfterMultDiv(CmmParser.ExpressionOperandAfterMultDivContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link CmmParser#expressionOperandAfterMultDiv}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpressionOperandAfterMultDiv(CmmParser.ExpressionOperandAfterMultDivContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CmmParser#expressionOperand}.
 	 * @param ctx the parse tree

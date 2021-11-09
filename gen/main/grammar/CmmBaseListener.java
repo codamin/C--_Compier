@@ -1,4 +1,4 @@
-// Generated from /home/amin/Desktop/compiler/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
+// Generated from /home/ho/C--_Compier/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
 package main.grammar;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -244,6 +244,18 @@ public class CmmBaseListener implements CmmListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterExpressionOperandAfterOr(CmmParser.ExpressionOperandAfterOrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExpressionOperandAfterOr(CmmParser.ExpressionOperandAfterOrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterExpressionOperandAfterAndOr(CmmParser.ExpressionOperandAfterAndOrContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -256,6 +268,30 @@ public class CmmBaseListener implements CmmListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterExpressionOperandAfterEq(CmmParser.ExpressionOperandAfterEqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExpressionOperandAfterEq(CmmParser.ExpressionOperandAfterEqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterExpressionOperandAfterLtGt(CmmParser.ExpressionOperandAfterLtGtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExpressionOperandAfterLtGt(CmmParser.ExpressionOperandAfterLtGtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterExpressionOperandAfterPlusMinus(CmmParser.ExpressionOperandAfterPlusMinusContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -263,18 +299,6 @@ public class CmmBaseListener implements CmmListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitExpressionOperandAfterPlusMinus(CmmParser.ExpressionOperandAfterPlusMinusContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterExpressionOperandAfterMultDiv(CmmParser.ExpressionOperandAfterMultDivContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitExpressionOperandAfterMultDiv(CmmParser.ExpressionOperandAfterMultDivContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

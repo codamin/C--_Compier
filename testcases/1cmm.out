@@ -19,9 +19,9 @@ VarDec : x
 Operator : *
 Operator : /
 Operator : -
-Operator : |
 Operator : -
 Operator : &
+Operator : |
 StructDec : S2
 VarDec : is_true_9_
 FunctionDec : f
@@ -32,8 +32,8 @@ Operator : +
 FunctionDec : g
 VarDec : s
 Conditional : if
-Operator : ==
 Operator : +
+Operator : ==
 Return
 Conditional : else
 Return
@@ -50,9 +50,9 @@ Operator : *
 Operator : +
 FunctionCall
 Loop : while
-Operator : >
-Operator : *
 Operator : +
+Operator : *
+Operator : >
 Loop : do...while
 Return
 Operator : +

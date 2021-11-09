@@ -1,4 +1,4 @@
-// Generated from /home/amin/Desktop/compiler/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
+// Generated from /home/ho/C--_Compier/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
 package main.grammar;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -125,23 +125,35 @@ public interface CmmVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpression(CmmParser.ExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link CmmParser#expressionOperandAfterOr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpressionOperandAfterOr(CmmParser.ExpressionOperandAfterOrContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link CmmParser#expressionOperandAfterAndOr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitExpressionOperandAfterAndOr(CmmParser.ExpressionOperandAfterAndOrContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link CmmParser#expressionOperandAfterEq}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpressionOperandAfterEq(CmmParser.ExpressionOperandAfterEqContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CmmParser#expressionOperandAfterLtGt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpressionOperandAfterLtGt(CmmParser.ExpressionOperandAfterLtGtContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link CmmParser#expressionOperandAfterPlusMinus}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitExpressionOperandAfterPlusMinus(CmmParser.ExpressionOperandAfterPlusMinusContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link CmmParser#expressionOperandAfterMultDiv}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpressionOperandAfterMultDiv(CmmParser.ExpressionOperandAfterMultDivContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link CmmParser#expressionOperand}.
 	 * @param ctx the parse tree

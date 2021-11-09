@@ -96,29 +96,44 @@ expresionFunctionCall:
         (nestedIdentifier call {System.out.println("FunctionCall");}) | expression
         ;
 
+//expression:
+//    (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
+//     expressionOperandAfterAndOr (((Operator = AND) | (Operator = OR)) expressionOperandAfterAndOr {System.out.println("Operator : " + $Operator.text);})*
+//     ;
+
 expression:
     (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
-     expressionOperandAfterAndOr (((Operator = AND) | (Operator = OR)) expressionOperandAfterAndOr {System.out.println("Operator : " + $Operator.text);})*
+     expressionOperandAfterOr ((Operator = OR) expressionOperandAfterOr {System.out.println("Operator : " + $Operator.text);})*
      ;
 
-expressionOperandAfterAndOr:
+ expressionOperandAfterOr:
+     (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
+      expressionOperandAfterAndOr ((Operator = AND) expressionOperandAfterAndOr {System.out.println("Operator : " + $Operator.text);})*
+      ;
+
+ expressionOperandAfterAndOr:
+     (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
+      expressionOperandAfterEq ((Operator = EQ) expressionOperandAfterEq {System.out.println("Operator : " + $Operator.text);})*
+      ;
+
+ expressionOperandAfterEq:
+     (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
+      expressionOperandAfterLtGt (((Operator = LT) | (Operator = GT))  expressionOperandAfterLtGt {System.out.println("Operator : " + $Operator.text);})*
+      ;
+
+expressionOperandAfterLtGt:
     (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
      expressionOperandAfterPlusMinus (((Operator = PLUS) | (Operator = MINUS)) expressionOperandAfterPlusMinus {System.out.println("Operator : " + $Operator.text);})*
     ;
 
 expressionOperandAfterPlusMinus:
     (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
-     expressionOperandAfterMultDiv (((Operator = MULT) | (Operator = DIVIDE)) expressionOperandAfterMultDiv {System.out.println("Operator : " + $Operator.text);})*
+     expressionOperand (((Operator = MULT) | (Operator = DIVIDE)) expressionOperand {System.out.println("Operator : " + $Operator.text);})*
      ;
 
-expressionOperandAfterMultDiv:
-    (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
-     expressionOperand (((Operator = EQ) | (Operator = LT) | (Operator = GT)) expressionOperand {System.out.println("Operator : " + $Operator.text);})*
-    ;
-
-//expressionOperandAfterAndOr:
+//expressionOperandAfterMultDiv:
 //    (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
-//     expressionOperand (((Operator = AND) | (Operator = OR)) expressionOperand {System.out.println("Operator : " + $Operator.text);})*
+//     expressionOperand (((Operator = EQ) | (Operator = LT) | (Operator = GT)) expressionOperand {System.out.println("Operator : " + $Operator.text);})*
 //    ;
 
 expressionOperand:

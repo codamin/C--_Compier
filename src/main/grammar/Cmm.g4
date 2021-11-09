@@ -1,6 +1,6 @@
 grammar Cmm;
 
-cmmParser:
+cmm:
     NEWLINE*
     structDeclaration* NEWLINE*
     methodDeclaration* NEWLINE*

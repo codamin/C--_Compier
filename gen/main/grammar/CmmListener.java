@@ -8,15 +8,15 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface CmmListener extends ParseTreeListener {
 	/**
-	 * Enter a parse tree produced by {@link CmmParser#cmmParser}.
+	 * Enter a parse tree produced by {@link CmmParser#cmm}.
 	 * @param ctx the parse tree
 	 */
-	void enterCmmParser(CmmParser.CmmParserContext ctx);
+	void enterCmm(CmmParser.CmmContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link CmmParser#cmmParser}.
+	 * Exit a parse tree produced by {@link CmmParser#cmm}.
 	 * @param ctx the parse tree
 	 */
-	void exitCmmParser(CmmParser.CmmParserContext ctx);
+	void exitCmm(CmmParser.CmmContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CmmParser#structDeclaration}.
 	 * @param ctx the parse tree

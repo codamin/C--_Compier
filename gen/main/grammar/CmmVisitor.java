@@ -11,11 +11,11 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface CmmVisitor<T> extends ParseTreeVisitor<T> {
 	/**
-	 * Visit a parse tree produced by {@link CmmParser#cmmParser}.
+	 * Visit a parse tree produced by {@link CmmParser#cmm}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCmmParser(CmmParser.CmmParserContext ctx);
+	T visitCmm(CmmParser.CmmContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link CmmParser#structDeclaration}.
 	 * @param ctx the parse tree

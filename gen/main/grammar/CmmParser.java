@@ -24,7 +24,7 @@ public class CmmParser extends Parser {
 		DISPLAY=33, APPEND=34, SIZE=35, VOID=36, GET=37, SET=38, WHILE=39, DO=40, 
 		IF=41, ELSE=42, FPTR=43, IDENTIFIER=44, WS=45, COMMENT=46;
 	public static final int
-		RULE_cmmParser = 0, RULE_structDeclaration = 1, RULE_structBody = 2, RULE_structVariableDeclarationGetSet = 3, 
+		RULE_cmm = 0, RULE_structDeclaration = 1, RULE_structBody = 2, RULE_structVariableDeclarationGetSet = 3, 
 		RULE_methodDeclaration = 4, RULE_arguments = 5, RULE_mainDeclaration = 6, 
 		RULE_functionBody = 7, RULE_multiFunctionBody = 8, RULE_returnStmt = 9, 
 		RULE_singleFunctionBody = 10, RULE_variableDeclaration = 11, RULE_ifBlock = 12, 
@@ -37,7 +37,7 @@ public class CmmParser extends Parser {
 		RULE_nestedIdentifier = 30, RULE_fptrVarTypes = 31, RULE_variableType = 32;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"cmmParser", "structDeclaration", "structBody", "structVariableDeclarationGetSet", 
+			"cmm", "structDeclaration", "structBody", "structVariableDeclarationGetSet", 
 			"methodDeclaration", "arguments", "mainDeclaration", "functionBody", 
 			"multiFunctionBody", "returnStmt", "singleFunctionBody", "variableDeclaration", 
 			"ifBlock", "elseBlock", "whileBlock", "doWhileBlock", "assignment", "expresionFunctionCall", 
@@ -121,7 +121,7 @@ public class CmmParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
-	public static class CmmParserContext extends ParserRuleContext {
+	public static class CmmContext extends ParserRuleContext {
 		public MainDeclarationContext mainDeclaration() {
 			return getRuleContext(MainDeclarationContext.class,0);
 		}
@@ -142,28 +142,28 @@ public class CmmParser extends Parser {
 		public MethodDeclarationContext methodDeclaration(int i) {
 			return getRuleContext(MethodDeclarationContext.class,i);
 		}
-		public CmmParserContext(ParserRuleContext parent, int invokingState) {
+		public CmmContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_cmmParser; }
+		@Override public int getRuleIndex() { return RULE_cmm; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterCmmParser(this);
+			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterCmm(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitCmmParser(this);
+			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitCmm(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitCmmParser(this);
+			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitCmm(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final CmmParserContext cmmParser() throws RecognitionException {
-		CmmParserContext _localctx = new CmmParserContext(_ctx, getState());
-		enterRule(_localctx, 0, RULE_cmmParser);
+	public final CmmContext cmm() throws RecognitionException {
+		CmmContext _localctx = new CmmContext(_ctx, getState());
+		enterRule(_localctx, 0, RULE_cmm);
 		int _la;
 		try {
 			int _alt;

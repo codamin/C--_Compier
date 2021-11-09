@@ -16,13 +16,13 @@ public class CmmBaseListener implements CmmListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCmmParser(CmmParser.CmmParserContext ctx) { }
+	@Override public void enterCmm(CmmParser.CmmContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCmmParser(CmmParser.CmmParserContext ctx) { }
+	@Override public void exitCmm(CmmParser.CmmContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

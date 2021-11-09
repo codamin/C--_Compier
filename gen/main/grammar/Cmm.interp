@@ -97,7 +97,7 @@ WS
 COMMENT
 
 rule names:
-cmmParser
+cmm
 structDeclaration
 structBody
 structVariableDeclarationGetSet

@@ -17,7 +17,7 @@ public class CmmBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Cm
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitCmmParser(CmmParser.CmmParserContext ctx) { return visitChildren(ctx); }
+	@Override public T visitCmm(CmmParser.CmmContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

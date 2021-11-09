@@ -46,9 +46,8 @@ functionBody:
    ;
 
 multiFunctionBody:
-    (
-    (assignment | expresionFunctionCall | variableDeclaration | returnStmt | ifBlock | doWhileBlock | whileBlock)
-    (SEMICOLLON (assignment | expresionFunctionCall | variableDeclaration | returnStmt | ifBlock | doWhileBlock | whileBlock))* SEMICOLLON? | NEWLINE)*
+    (((assignment | expresionFunctionCall | variableDeclaration | returnStmt | ifBlock | doWhileBlock | whileBlock)
+    (SEMICOLLON (assignment | expresionFunctionCall | variableDeclaration | returnStmt | ifBlock | doWhileBlock | whileBlock))* SEMICOLLON?) | NEWLINE)*
     ;
 
 returnStmt:
@@ -56,9 +55,9 @@ returnStmt:
     ;
 
 singleFunctionBody:
-NEWLINE*
-((assignment | expresionFunctionCall | variableDeclaration | returnStmt  | ifBlock | whileBlock | doWhileBlock)
- (SEMICOLLON (assignment | expresionFunctionCall | variableDeclaration | returnStmt | ifBlock | whileBlock | doWhileBlock))* SEMICOLLON?) NEWLINE*
+    NEWLINE*
+    ((assignment | expresionFunctionCall | variableDeclaration | returnStmt  | ifBlock | whileBlock | doWhileBlock)
+     (SEMICOLLON (assignment | expresionFunctionCall | variableDeclaration | returnStmt | ifBlock | whileBlock | doWhileBlock))* SEMICOLLON?) NEWLINE*
     ;
 
 variableDeclaration:
@@ -96,11 +95,6 @@ expresionFunctionCall:
         (nestedIdentifier call {System.out.println("FunctionCall");}) | expression
         ;
 
-//expression:
-//    (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
-//     expressionOperandAfterAndOr (((Operator = AND) | (Operator = OR)) expressionOperandAfterAndOr {System.out.println("Operator : " + $Operator.text);})*
-//     ;
-
 expression:
     (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
      expressionOperandAfterOr ((Operator = OR) expressionOperandAfterOr {System.out.println("Operator : " + $Operator.text);})*
@@ -131,11 +125,6 @@ expressionOperandAfterPlusMinus:
      expressionOperand (((Operator = MULT) | (Operator = DIVIDE)) expressionOperand {System.out.println("Operator : " + $Operator.text);})*
      ;
 
-//expressionOperandAfterMultDiv:
-//    (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
-//     expressionOperand (((Operator = EQ) | (Operator = LT) | (Operator = GT)) expressionOperand {System.out.println("Operator : " + $Operator.text);})*
-//    ;
-
 expressionOperand:
   (((Operator = NEG) | (Operator = PLUS) | (Operator = MINUS))? LPAR expression RPAR {if($Operator.text != null) System.out.println("Operator : " + $Operator.text);}) |
   (((LPAR expression RPAR) | functionCall | nestedIdentifier) index) |
@@ -144,7 +133,7 @@ expressionOperand:
    ;
 
 index:
-    (LBRACKET NUM RBRACKET)+
+    (LBRACKET expression RBRACKET)+
     ;
 
 functionCall:
@@ -162,10 +151,10 @@ callArguments:
 primitiveFunctions:
     (DISPLAY {System.out.println("Built-in : display");} LPAR expression RPAR) |
     (SIZE {System.out.println("Size");} LPAR expression RPAR) |
-    (APPEND {System.out.println("Append");} LPAR nestedIdentifier COMMA expression RPAR)
+    (APPEND {System.out.println("Append");} LPAR expression COMMA expression RPAR)
 ;
 
-nestedIdentifier: IDENTIFIER (DOT IDENTIFIER)* (LBRACKET expression RBRACKET)*;
+nestedIdentifier: (IDENTIFIER index?) (DOT (IDENTIFIER index?))*;
 
 fptrVarTypes:
     INT | BOOL | (STRUCT IDENTIFIER) | (LIST SHARP (LIST SHARP)* variableType)

@@ -51,7 +51,7 @@ multiFunctionBody:
     ;
 
 returnStmt:
-    RETURN {System.out.println("Return");} expression?
+    RETURN {System.out.println("Return");} (expression | assignment)?
     ;
 
 singleFunctionBody:
@@ -88,7 +88,7 @@ doWhileBlock:
     ;
 
 assignment:
-    nestedIdentifier ASSIGN expression
+    (nestedIdentifier ASSIGN)+ expression
     ;
 
 expresionFunctionCall:
@@ -145,7 +145,7 @@ call:
     ;
 
 callArguments:
-    expression (COMMA expression)*
+    (expression | assignment) (COMMA (expression | assignment))*
 ;
 
 primitiveFunctions:

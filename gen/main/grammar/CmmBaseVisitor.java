@@ -1,4 +1,4 @@
-// Generated from /home/ho/C--_Compier/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
+// Generated from /home/amin/Desktop/compiler/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
 package main.grammar;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 

@@ -1,5 +1,4 @@
-// Generated from /home/amin/Desktop/compiler/Phase-2/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
-package parsers;
+// Generated from /home/amin/Desktop/compiler/Phase-2/out/production/Phase2/main/grammar/Cmm.g4 by ANTLR 4.8
 
      import main.ast.nodes.*;
      import main.ast.nodes.declaration.*;
@@ -24,7 +23,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class CmmParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.9.2", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -153,19 +152,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_cmm; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterCmm(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitCmm(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitCmm(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final CmmContext cmm() throws RecognitionException {
@@ -245,19 +231,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_program; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterProgram(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitProgram(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitProgram(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ProgramContext program() throws RecognitionException {
@@ -333,19 +306,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_main; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterMain(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitMain(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitMain(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final MainContext main() throws RecognitionException {
@@ -405,19 +365,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_structDeclaration; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterStructDeclaration(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitStructDeclaration(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitStructDeclaration(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final StructDeclarationContext structDeclaration() throws RecognitionException {
@@ -559,19 +506,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_singleVarWithGetAndSet; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterSingleVarWithGetAndSet(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitSingleVarWithGetAndSet(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitSingleVarWithGetAndSet(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final SingleVarWithGetAndSetContext singleVarWithGetAndSet() throws RecognitionException {
@@ -630,7 +564,7 @@ public class CmmParser extends Parser {
 	}
 
 	public static class SingleStatementStructBodyContext extends ParserRuleContext {
-		public Statement singleStatementStructBodyRet;
+		public BlockStmt singleStatementStructBodyRet;
 		public VarDecStatementContext vd;
 		public SingleVarWithGetAndSetContext sv;
 		public VarDecStatementContext varDecStatement() {
@@ -643,19 +577,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_singleStatementStructBody; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterSingleStatementStructBody(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitSingleStatementStructBody(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitSingleStatementStructBody(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final SingleStatementStructBodyContext singleStatementStructBody() throws RecognitionException {
@@ -673,7 +594,8 @@ public class CmmParser extends Parser {
 				setState(182);
 				((SingleStatementStructBodyContext)_localctx).vd = varDecStatement();
 
-				        ((SingleStatementStructBodyContext)_localctx).singleStatementStructBodyRet =  ((SingleStatementStructBodyContext)_localctx).vd.varDecStatementRet;
+				        _localctx.singleStatementStructBodyRet.addStatement(((SingleStatementStructBodyContext)_localctx).vd.varDecStatementRet);
+				        _localctx.singleStatementStructBodyRet.setLine(((SingleStatementStructBodyContext)_localctx).vd.varDecStatementRet.getLine());
 				    
 				}
 				break;
@@ -682,7 +604,8 @@ public class CmmParser extends Parser {
 				setState(185);
 				((SingleStatementStructBodyContext)_localctx).sv = singleVarWithGetAndSet();
 
-				        ((SingleStatementStructBodyContext)_localctx).singleStatementStructBodyRet =  ((SingleStatementStructBodyContext)_localctx).sv.singleVarWithGetAndSetRet;
+				        _localctx.singleStatementStructBodyRet.addStatement(((SingleStatementStructBodyContext)_localctx).sv.singleVarWithGetAndSetRet);
+				        _localctx.singleStatementStructBodyRet.setLine(((SingleStatementStructBodyContext)_localctx).sv.singleVarWithGetAndSetRet.getLine());
 				    
 				}
 				break;
@@ -722,19 +645,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_structBody; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterStructBody(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitStructBody(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitStructBody(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final StructBodyContext structBody() throws RecognitionException {
@@ -844,19 +754,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_getBody; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterGetBody(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitGetBody(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitGetBody(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final GetBodyContext getBody() throws RecognitionException {
@@ -913,19 +810,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_setBody; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterSetBody(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitSetBody(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitSetBody(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final SetBodyContext setBody() throws RecognitionException {
@@ -994,19 +878,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_functionDeclaration; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterFunctionDeclaration(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitFunctionDeclaration(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitFunctionDeclaration(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final FunctionDeclarationContext functionDeclaration() throws RecognitionException {
@@ -1106,19 +977,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_functionArgsDec; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterFunctionArgsDec(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitFunctionArgsDec(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitFunctionArgsDec(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final FunctionArgsDecContext functionArgsDec() throws RecognitionException {
@@ -1198,19 +1056,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_functionArguments; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterFunctionArguments(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitFunctionArguments(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitFunctionArguments(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final FunctionArgumentsContext functionArguments() throws RecognitionException {
@@ -1285,19 +1130,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_body; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterBody(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitBody(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitBody(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final BodyContext body() throws RecognitionException {
@@ -1384,19 +1216,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_loopCondBody; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterLoopCondBody(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitLoopCondBody(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitLoopCondBody(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final LoopCondBodyContext loopCondBody() throws RecognitionException {
@@ -1483,19 +1302,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_blockStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterBlockStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitBlockStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitBlockStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final BlockStatementContext blockStatement() throws RecognitionException {
@@ -1641,19 +1447,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_varDecStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterVarDecStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitVarDecStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitVarDecStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final VarDecStatementContext varDecStatement() throws RecognitionException {
@@ -1775,19 +1568,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_functionCallStmt; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterFunctionCallStmt(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitFunctionCallStmt(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitFunctionCallStmt(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final FunctionCallStmtContext functionCallStmt() throws RecognitionException {
@@ -1891,19 +1671,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_returnStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterReturnStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitReturnStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitReturnStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ReturnStatementContext returnStatement() throws RecognitionException {
@@ -1965,19 +1732,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_ifStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterIfStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitIfStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitIfStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final IfStatementContext ifStatement() throws RecognitionException {
@@ -2045,19 +1799,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_elseStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterElseStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitElseStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitElseStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ElseStatementContext elseStatement() throws RecognitionException {
@@ -2113,19 +1854,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_loopStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterLoopStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitLoopStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitLoopStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final LoopStatementContext loopStatement() throws RecognitionException {
@@ -2182,19 +1910,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_whileLoopStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterWhileLoopStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitWhileLoopStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitWhileLoopStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final WhileLoopStatementContext whileLoopStatement() throws RecognitionException {
@@ -2249,19 +1964,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_doWhileLoopStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterDoWhileLoopStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitDoWhileLoopStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitDoWhileLoopStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final DoWhileLoopStatementContext doWhileLoopStatement() throws RecognitionException {
@@ -2326,19 +2028,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_displayStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterDisplayStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitDisplayStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitDisplayStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final DisplayStatementContext displayStatement() throws RecognitionException {
@@ -2388,19 +2077,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_assignmentStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterAssignmentStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitAssignmentStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitAssignmentStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final AssignmentStatementContext assignmentStatement() throws RecognitionException {
@@ -2474,19 +2150,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_singleStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterSingleStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitSingleStatement(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitSingleStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final SingleStatementContext singleStatement() throws RecognitionException {
@@ -2597,19 +2260,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ExpressionContext expression() throws RecognitionException {
@@ -2671,19 +2321,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_orExpression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterOrExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitOrExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitOrExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final OrExpressionContext orExpression() throws RecognitionException {
@@ -2749,19 +2386,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_andExpression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterAndExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitAndExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitAndExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final AndExpressionContext andExpression() throws RecognitionException {
@@ -2827,19 +2451,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_equalityExpression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterEqualityExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitEqualityExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitEqualityExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final EqualityExpressionContext equalityExpression() throws RecognitionException {
@@ -2910,19 +2521,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_relationalExpression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterRelationalExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitRelationalExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitRelationalExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final RelationalExpressionContext relationalExpression() throws RecognitionException {
@@ -3010,19 +2608,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_additiveExpression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterAdditiveExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitAdditiveExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitAdditiveExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final AdditiveExpressionContext additiveExpression() throws RecognitionException {
@@ -3110,19 +2695,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_multiplicativeExpression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterMultiplicativeExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitMultiplicativeExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitMultiplicativeExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final MultiplicativeExpressionContext multiplicativeExpression() throws RecognitionException {
@@ -3205,19 +2777,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_preUnaryExpression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterPreUnaryExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitPreUnaryExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitPreUnaryExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final PreUnaryExpressionContext preUnaryExpression() throws RecognitionException {
@@ -3348,19 +2907,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_accessExpression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterAccessExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitAccessExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitAccessExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final AccessExpressionContext accessExpression() throws RecognitionException {
@@ -3510,19 +3056,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_otherExpression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterOtherExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitOtherExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitOtherExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final OtherExpressionContext otherExpression() throws RecognitionException {
@@ -3609,19 +3142,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_size; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterSize(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitSize(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitSize(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final SizeContext size() throws RecognitionException {
@@ -3674,19 +3194,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_append; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterAppend(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitAppend(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitAppend(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final AppendContext append() throws RecognitionException {
@@ -3736,19 +3243,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_value; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterValue(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitValue(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitValue(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ValueContext value() throws RecognitionException {
@@ -3800,19 +3294,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_boolValue; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterBoolValue(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitBoolValue(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitBoolValue(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final BoolValueContext boolValue() throws RecognitionException {
@@ -3862,19 +3343,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_identifier; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterIdentifier(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitIdentifier(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitIdentifier(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final IdentifierContext identifier() throws RecognitionException {
@@ -3923,19 +3391,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_type; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterType(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitType(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitType(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final TypeContext type() throws RecognitionException {
@@ -4024,19 +3479,6 @@ public class CmmParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_fptrType; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).enterFptrType(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CmmListener ) ((CmmListener)listener).exitFptrType(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof CmmVisitor ) return ((CmmVisitor<? extends T>)visitor).visitFptrType(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final FptrTypeContext fptrType() throws RecognitionException {

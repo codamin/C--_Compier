@@ -57,12 +57,12 @@ singleVarWithGetAndSet returns[SetGetVarDeclaration singleVarWithGetAndSetRet]:
     END;
 
 //todo
-singleStatementStructBody returns[BlockStmt singleStatementStructBodyRet]:
+singleStatementStructBody returns[Statement singleStatementStructBodyRet]:
     {$singleStatementStructBodyRet = new BlockStmt();}
     (vd = varDecStatement {
-        $singleStatementStructBodyRet.addStatement($vd.varDecStatementRet);
+        $singleStatementStructBodyRet = $vd.varDecStatementRet;
     } | sv = singleVarWithGetAndSet {
-        $singleStatementStructBodyRet.addStatement($sv.singleVarWithGetAndSetRet);
+        $singleStatementStructBodyRet = $sv.singleVarWithGetAndSetRet;
     });
 
 //todo
@@ -70,8 +70,10 @@ structBody returns[BlockStmt structBodyRet] :
     {$structBodyRet = new BlockStmt();}
     (NEWLINE+ (s1 = singleStatementStructBody {
         $structBodyRet.addStatement($s1.singleStatementStructBodyRet);
+//        $structBodyRet.setLine($s1.singleStatementStructBodyRet.getLine());
     } SEMICOLON)* s2 = singleStatementStructBody {
         $structBodyRet.addStatement($s2.singleStatementStructBodyRet);
+//        $structBodyRet.setLine($s2.singleStatementStructBodyRet.getLine());
     } SEMICOLON?)+;
 
 //todo
@@ -85,7 +87,7 @@ setBody returns[Statement setBodyRet] :
 //todo
 functionDeclaration returns[FunctionDeclaration functionDeclarationRet]:
 {$functionDeclarationRet = new FunctionDeclaration();}
-    (t = type {$functionDeclarationRet.setReturnType($t.typeRet);} | VOID )
+    (t = type {$functionDeclarationRet.setReturnType($t.typeRet);} | VOID {$functionDeclarationRet.setReturnType(new VoidType());})
     id = identifier {
         $functionDeclarationRet.setFunctionName($id.identifierRet);
         $functionDeclarationRet.setLine($id.line);
@@ -113,10 +115,10 @@ functionArguments returns[ExprInPar functionArgumentsRet] :
     (COMMA ex = expression {inputs.add($ex.expressionRet);})*)? {$functionArgumentsRet.setInputs(inputs);};
 
 //todo
-body returns[BlockStmt bodyRet]:
-    {$bodyRet = new BlockStmt();}
-     (b = blockStatement {$bodyRet.addStatement($b.blockStatementRet);} |
-     (NEWLINE+ b1 = singleStatement {$bodyRet.addStatement($b1.singleStatementRet);} (SEMICOLON)?));
+body returns[Statement bodyRet]:
+//    {$bodyRet = new BlockStmt();}
+     (b = blockStatement {$bodyRet = $b.blockStatementRet;} |
+     (NEWLINE+ b1 = singleStatement {$bodyRet = $b1.singleStatementRet;} (SEMICOLON)?));
 
 //todo
 loopCondBody returns[Statement loopCondBodyRet]:
@@ -130,7 +132,6 @@ loopCondBody returns[Statement loopCondBodyRet]:
 blockStatement returns[BlockStmt blockStatementRet]:
     {$blockStatementRet = new BlockStmt();}
     bg = BEGIN {
-    System.out.println($bg.getLine());
     $blockStatementRet.setLine($bg.getLine());
     }
      (NEWLINE+ (ss = singleStatement {
@@ -138,10 +139,7 @@ blockStatement returns[BlockStmt blockStatementRet]:
      } SEMICOLON)*
      ss = singleStatement {
      $blockStatementRet.addStatement($ss.singleStatementRet);
-     } (SEMICOLON)?)+ NEWLINE+ END
-     {
-     System.out.println("skd");
-     System.out.println($blockStatementRet.getLine());};
+     } (SEMICOLON)?)+ NEWLINE+ END;
 
 //todo
 varDecStatement returns[VarDecStmt varDecStatementRet] :
@@ -149,16 +147,17 @@ varDecStatement returns[VarDecStmt varDecStatementRet] :
     $varDecStatementRet = new VarDecStmt();
     ArrayList<VariableDeclaration> vars = new ArrayList<>();
     }
-    tp = type id = identifier (ASSIGN oe = orExpression {
+    tp = type
+        id = identifier (ASSIGN oe = orExpression {
         VariableDeclaration vd = new VariableDeclaration($id.identifierRet, $tp.typeRet);
         vd.setDefaultValue($oe.orExpressionRet);
         vars.add(vd);
+        $varDecStatementRet.setLine($id.line);
     })? (COMMA id = identifier (ASSIGN oe = orExpression {
         VariableDeclaration vd = new VariableDeclaration($id.identifierRet, $tp.typeRet);
-        System.out.println(vd == null);
-        System.out.println($oe.orExpressionRet == null);
         vd.setDefaultValue($oe.orExpressionRet);
         vars.add(vd);
+        $varDecStatementRet.setLine($id.line);
     })? )*
     {$varDecStatementRet.setVars(vars);}
     ;
@@ -190,7 +189,8 @@ returnStatement returns[ReturnStmt returnStatementRet] :
 
 //todo
 ifStatement returns[ConditionalStmt ifStatementRet]:
-    IF e = expression {$ifStatementRet = new ConditionalStmt($e.expressionRet);}
+    iftemp = IF e = expression {$ifStatementRet = new ConditionalStmt($e.expressionRet);
+     {$ifStatementRet.setLine($iftemp.getLine());}}
     (lc = loopCondBody {
         $ifStatementRet.setThenBody($lc.loopCondBodyRet);
     } | bd = body es = elseStatement {
@@ -402,8 +402,8 @@ value returns[Value valueRet]:
 
 //todo
 boolValue returns [BoolValue boolValueRet]:
-    TRUE {$boolValueRet = new BoolValue(true);} |
-    FALSE {$boolValueRet = new BoolValue(false);};
+    tr = TRUE {$boolValueRet = new BoolValue(true); $boolValueRet.setLine($tr.getLine());} |
+    fa = FALSE {$boolValueRet = new BoolValue(false); $boolValueRet.setLine($fa.getLine());};
 
 //todo
 identifier returns[Identifier identifierRet, int line]:

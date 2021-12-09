@@ -37,14 +37,14 @@ structDeclaration returns[StructDeclaration structDeclarationRet]:
     s = STRUCT {$structDeclarationRet.setline($s.getline());}
     i = identifier {$structDeclarationRet.setStructName($i.identifierRet);}
      ((BEGIN b1 = structBody NEWLINE+ END {$structDeclarationRet.setBody($b1.strcutBodyRet);}) |
-      (NEWLINE+ b2 = singleStatementStructBody SEMICOLON? {$structDeclarationRet.setBody($b2.singleStatementStructBodyRet);})) NEWLINE+;
+      (NEWLINE+ b2 = singleStatementStructBody SEMICOLON? {$structDeclarationRet.setBody($b2.strcutBodyRet);})) NEWLINE+;
 
 //todo
 singleVarWithGetAndSet :
     type identifier functionArgsDec BEGIN NEWLINE+ setBody getBody END;
 
 //todo
-singleStatementStructBody returns[BlockStmt singleStatementStructBodyRet] :
+singleStatementStructBody :
     varDecStatement | singleVarWithGetAndSet;
 
 //todo
@@ -63,11 +63,8 @@ setBody :
 functionDeclaration returns[FunctionDeclaration functionDeclarationRet]:
 {functionDeclarationRet = new FunctionDeclaration();}
     (t = type {functionDeclarationRet.setReturnType($t.typeRet);} | VOID ) 
-    id = identifier {
-        functionDeclarationRet.setFunctionName($id.identifierRet);
-        functionDeclarationRet.setLine($id.line);
-    }
-    a = functionArgsDec {functionDeclarationRet.setArgs($a.functionArgsDecRet);}
+    i = identifier {functionDeclarationRet.setFunctionName($i.identifierRet); functionDeclarationRet.setLine($i.getLine());}
+    a = functionArgsDec {functionDeclarationRet.setArgs($a.functionArgsDecRet);} 
     b = body {$functionDeclarationRet.setBody($b.bodyRet);} NEWLINE+;
 
 //todo
@@ -87,7 +84,7 @@ functionArguments returns[ArrayList<Expression> functionArgumentsRet] :
 body returns[Statement bodyRet]:
     {bodyRet = new BlockStmt();}
      (b = blockStatement {bodyRet.addStatement($b.blockStatementRet);} |
-      (NEWLINE+ b1 = singleStatement {bodyRet.addStatement($b1.singleStatementRet);} (SEMICOLON)?));
+      (NEWLINE+ b1 = singleStatement {bodyRet.addStatement($b1.blockStatementRet);} (SEMICOLON)?));
 
 //todo
 loopCondBody :
@@ -101,7 +98,7 @@ blockStatement returns[Statement blockStatementRet]:
      ss = singleStatement {blockStatementRet.addStatement($ss.singleStatementRet);} (SEMICOLON)?)+ NEWLINE+ END;
 
 //todo
-varDecStatement returns [VarDecStatement varDecStatementRet] :
+varDecStatement :
     type identifier (ASSIGN orExpression )? (COMMA identifier (ASSIGN orExpression)? )*;
 
 //todo
@@ -187,7 +184,7 @@ rel = relationalExpression
 (op = EQUAL rer = relationalExpression 
 {
     BinaryOperator bo = BinaryOperator.equal;
-    $equalityExpressionRet = new BinaryExpression(rel.relationalExpressionRet, $rer.relationalExpressionRet, bo);
+    $equalityExpressionRet = new BinaryExpression(rel.relationalExpressionRet, $eqr.relationalExpressionRet, bo);
     $equalityExpressionRet.setLine($op.getLine());
 })*;
 
@@ -228,18 +225,17 @@ pur = preUnaryExpression
 })*;
 
 //todo
-preUnaryExpression returns[Expression preUnaryExpressionRet] locals[int line]:
-    ((op = NOT {BinaryOperator bo = BinaryOperator.not; $line = $op.getLine();} |
-    op = MINUS {BinaryOperator bo = BinaryOperator.minus; $line = $op.getLine();})
+preUnaryExpression returns[Expression preUnaryExpressionRet]:
+    ((op = NOT {BinaryOperator bo = BinaryOperator.not;} | op = MINUS {BinaryOperator bo = BinaryOperator.minus;})
     pue = preUnaryExpression 
     {
-        preUnaryExpressionRet = new UnaryExpression($pue.preUnaryExpressionRet, bo);
-        preUnaryExpressionRet.setLine($line);
+        preUnaryExpressionRet = new UnaryExpression($pue.preUnaryExpression, bo);
+        preUnaryExpressionRet.setLine($op.getLine());
     }) |
     ae = accessExpression
     {
         preUnaryExpressionRet = new UnaryExpression($ae.accessExpressionRet, bo);
-        preUnaryExpressionRet.setLine($line);
+        preUnaryExpressionRet.setLine($op.getLine());
     };
 
 
@@ -247,7 +243,7 @@ preUnaryExpression returns[Expression preUnaryExpressionRet] locals[int line]:
 accessExpression returns[Expression accessExpressionRet]:
     oe = otherExpression
     {accessExpressionRet = $oe.otherExpressionRet;}
-    ((lp = LPAR fa = functionArguments
+    ((lp = LPAR functionArguments
     {
         accessExpressionRet = new FunctionCall(accessExpressionRet, $fa.functionArgumentsRet);
         accessExpressionRet.setLine($lp.getLine());
@@ -264,7 +260,7 @@ accessExpression returns[Expression accessExpressionRet]:
 
 //todo
 otherExpression returns[Expression otherExpressionRet]:
-    vl = value {otherExpressionRet = $vl.valueRet;} |
+    vl = value {otherExpressionRet = $vl.ValueRet;} |
     id = identifier {otherExpressionRet = $id.identifierRet;} |
     lp = LPAR (fa = functionArguments) {otherExpressionRet = $fa.functionArgumentsRet;}
     RPAR | sz = size {therExpressionRet = $sz.sizeRet;} |
@@ -295,13 +291,9 @@ boolValue returns [BoolValue boolValueRet]:
     FALSE {boolValueRet = new BoolValue(false);};
 
 //todo
-identifier returns[Identifier identifierRet, int line]:
-    i = IDENTIFIER {
-    identifierRet = new Identifier($i.text);
-    identifierRet.setLine($i.getLine());
-    $line = $i.getLine();
-    };
-
+identifier returns[Identifier identifierRet]:
+    i = IDENTIFIER {identifierRet = new Identifier($i.text); identifierRet.setLine($i.getLine());};
+    
 //todo
 type returns[Type typeRet]:
     INT | BOOL | LIST SHARP type | STRUCT identifier | fptrType;

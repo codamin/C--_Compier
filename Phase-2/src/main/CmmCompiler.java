@@ -12,6 +12,14 @@ public class CmmCompiler {
         CmmParser cmmParser = new CmmParser(tokenStream);
 
         Program program = cmmParser.cmm().cmmProgram;
+        program.accept(new NameAnalyzer());
+        program.accept(new SecondPassNameAnalyzer());
+        if (ErrorCollector.hasErrors()) {
+            ErrorCollector.print();
+        }
+        else {
+            program.accept(new ASTTreePrinter());
+        }
 
         //todo
     }

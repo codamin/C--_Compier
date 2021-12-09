@@ -79,7 +79,8 @@ public class ASTTreePrinter extends Visitor<Void> {
         messagePrinter(variableDec.getLine(), variableDec.toString());
         variableDec.getVarName().accept(this);
 //        variableDec.getVarType().accept(this);
-        variableDec.getDefaultValue().accept(this);
+        if(variableDec.getDefaultValue() != null)
+            variableDec.getDefaultValue().accept(this);
         //todo
         return null;
     }
@@ -117,8 +118,9 @@ public class ASTTreePrinter extends Visitor<Void> {
     @Override
     public Void visit(BlockStmt blockStmt) {
         messagePrinter(blockStmt.getLine(), blockStmt.toString());
-        for (Statement statement: blockStmt.getStatements())
+        for (Statement statement: blockStmt.getStatements()) {
             statement.accept(this);
+        }
         //todo
         return null;
     }

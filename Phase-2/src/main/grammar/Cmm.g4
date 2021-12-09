@@ -99,7 +99,6 @@ functionArgsDec returns[ArrayList<VariableDeclaration> functionArgsDecRet]:
     LPAR (t = type i = identifier
      {
      VariableDeclaration v1 = new VariableDeclaration($i.identifierRet, $t.typeRet);
-     $functionArgsDecRet.add(v1);
      }
       (COMMA t = type i = identifier {VariableDeclaration v2 = new VariableDeclaration($i.identifierRet, $t.typeRet);
         $functionArgsDecRet.add(v2);})*)? RPAR ;
@@ -130,9 +129,15 @@ loopCondBody returns[Statement loopCondBodyRet]:
 //todo
 blockStatement returns[BlockStmt blockStatementRet]:
     {$blockStatementRet = new BlockStmt();}
-    bg = BEGIN {$blockStatementRet.setLine($bg.getLine());}
-     (NEWLINE+ (ss = singleStatement {$blockStatementRet.addStatement($ss.singleStatementRet);} SEMICOLON)*
-     ss = singleStatement {$blockStatementRet.addStatement($ss.singleStatementRet);} (SEMICOLON)?)+ NEWLINE+ END;
+    bg = BEGIN {
+    $blockStatementRet.setLine($bg.getLine());
+    }
+     (NEWLINE+ (ss = singleStatement {
+     $blockStatementRet.addStatement($ss.singleStatementRet);
+     } SEMICOLON)*
+     ss = singleStatement {
+     $blockStatementRet.addStatement($ss.singleStatementRet);
+     } (SEMICOLON)?)+ NEWLINE+ END;
 
 //todo
 varDecStatement returns[VarDecStmt varDecStatementRet] :
@@ -144,19 +149,33 @@ varDecStatement returns[VarDecStmt varDecStatementRet] :
         VariableDeclaration vd = new VariableDeclaration($id.identifierRet, $tp.typeRet);
         vd.setDefaultValue($oe.orExpressionRet);
         vars.add(vd);
-    })? (COMMA id = identifier (ASSIGN oe = orExpression)?
-    {
+    })? (COMMA id = identifier (ASSIGN oe = orExpression {
         VariableDeclaration vd = new VariableDeclaration($id.identifierRet, $tp.typeRet);
+        System.out.println(vd == null);
+        System.out.println($oe.orExpressionRet == null);
         vd.setDefaultValue($oe.orExpressionRet);
         vars.add(vd);
-    })*
+    })? )*
     {$varDecStatementRet.setVars(vars);}
     ;
 
 //todo
-functionCallStmt returns[FunctionCallStmt functionCallStmtRet]:
-//    {functionCallStmtRet = new FunctionCallStmt();}
-     oe = otherExpression ((LPAR fa = functionArguments RPAR) | (DOT identifier))* (LPAR functionArguments RPAR);
+functionCallStmt returns[FunctionCallStmt functionCallStmtRet] locals[FunctionCall functionCall]:
+     oe = otherExpression {
+        $functionCall = new FunctionCall($oe.otherExpressionRet);
+     } ((lp = LPAR fa = functionArguments {
+        $functionCall.setArgs($fa.functionArgumentsRet.getInputs());
+        $functionCall.setLine($lp.getLine());
+     } RPAR) | {
+        Expression sa = $oe.otherExpressionRet;
+     } (DOT id = identifier {
+        StructAccess tmp = new StructAccess(sa, $id.identifierRet);
+        sa = tmp;
+     }))* (lp = LPAR fa = functionArguments {
+        $functionCall.setArgs($fa.functionArgumentsRet.getInputs());
+        $functionCall.setLine($lp.getLine());
+     } RPAR)
+     {$functionCallStmtRet = new FunctionCallStmt($functionCall);};
 
 //todo
 returnStatement returns[ReturnStmt returnStatementRet] :
@@ -167,12 +186,18 @@ returnStatement returns[ReturnStmt returnStatementRet] :
 
 //todo
 ifStatement returns[ConditionalStmt ifStatementRet]:
-    IF e = expression {$ifStatementRet = new ConditionalStmt($e.expressionRet);} (loopCondBody | body elseStatement);
+    IF e = expression {$ifStatementRet = new ConditionalStmt($e.expressionRet);}
+    (lc = loopCondBody {
+        $ifStatementRet.setThenBody($lc.loopCondBodyRet);
+    } | bd = body es = elseStatement {
+        $ifStatementRet.setThenBody($bd.bodyRet);
+        $ifStatementRet.setElseBody($es.elseStatementRet);
+    });
 
 
 //todo
-elseStatement :
-     NEWLINE* ELSE loopCondBody;
+elseStatement returns[Statement elseStatementRet] :
+     NEWLINE* ELSE lc = loopCondBody {$elseStatementRet = $lc.loopCondBodyRet;};
 
 //todo
 loopStatement returns[LoopStmt loopStatementRet] :
@@ -202,7 +227,8 @@ doWhileLoopStatement returns[LoopStmt doWhileLoopStatementRet] :
 //todo
 displayStatement returns[DisplayStmt displayStatementRet] :
   dis = DISPLAY LPAR ex = expression
-    {$displayStatementRet = new DisplayStmt($ex.expressionRet);
+    {
+    $displayStatementRet = new DisplayStmt($ex.expressionRet);
     $displayStatementRet.setLine($dis.getLine());
     }
   RPAR;
@@ -238,7 +264,7 @@ oe = orExpression
 })? ;
 
 //todo
-orExpression returns[BinaryExpression orExpressionRet]:
+orExpression returns[Expression orExpressionRet]:
 ael=andExpression
 { $orExpressionRet = $ael.andExpressionRet;}
 (op=OR aer=andExpression
@@ -250,7 +276,7 @@ ael=andExpression
 
 
 //todo
-andExpression returns[BinaryExpression andExpressionRet]:
+andExpression returns[Expression andExpressionRet]:
 eql = equalityExpression
 {$andExpressionRet = $eql.equalityExpressionRet;}
 (op = AND eqr = equalityExpression 
@@ -261,7 +287,7 @@ eql = equalityExpression
 })*;
 
 //todo
-equalityExpression returns[BinaryExpression equalityExpressionRet]:
+equalityExpression returns[Expression equalityExpressionRet]:
 rel = relationalExpression
 {$equalityExpressionRet = $rel.relationalExpressionRet;}
 (op = EQUAL rer = relationalExpression 
@@ -272,7 +298,7 @@ rel = relationalExpression
 })*;
 
 //todo
-relationalExpression returns[BinaryExpression relationalExpressionRet] locals[BinaryOperator bo]:
+relationalExpression returns[Expression relationalExpressionRet] locals[BinaryOperator bo]:
 ael = additiveExpression
 {$relationalExpressionRet = $ael.additiveExpressionRet;}
 ((op = GREATER_THAN {$bo = BinaryOperator.gt;} | op = LESS_THAN {$bo = BinaryOperator.lt;})
@@ -284,7 +310,7 @@ aer = additiveExpression
 
 
 //todo
-additiveExpression returns[BinaryExpression additiveExpressionRet] locals[BinaryOperator bo]:
+additiveExpression returns[Expression additiveExpressionRet] locals[BinaryOperator bo]:
 mpl = multiplicativeExpression
 {$additiveExpressionRet = $mpl.multiplicativeExpressionRet;}
 ((op = PLUS {$bo = BinaryOperator.add;} | op = MINUS {$bo = BinaryOperator.sub;}) 
@@ -297,7 +323,7 @@ mpr = multiplicativeExpression
 
 
 //todo
-multiplicativeExpression returns[BinaryExpression multiplicativeExpressionRet] locals[BinaryOperator bo]:
+multiplicativeExpression returns[Expression multiplicativeExpressionRet] locals[BinaryOperator bo]:
 pul = preUnaryExpression
 {$multiplicativeExpressionRet = $pul.preUnaryExpressionRet;}
 ((op = MULT {$bo = BinaryOperator.mult;} | op = DIVIDE {$bo = BinaryOperator.div;})
@@ -308,18 +334,19 @@ pur = preUnaryExpression
 })*;
 
 //todo
-preUnaryExpression returns[UnaryExpression preUnaryExpressionRet] locals[int line, UnaryOperator bo]:
+preUnaryExpression returns[Expression preUnaryExpressionRet] locals[int line, UnaryOperator bo]:
     ((op = NOT {$bo = UnaryOperator.not; $line = $op.getLine();} |
     op = MINUS {$bo = UnaryOperator.minus; $line = $op.getLine();})
     pue = preUnaryExpression 
     {
+        System.out.println("one");
+        System.out.println($bo == null);
         $preUnaryExpressionRet = new UnaryExpression($pue.preUnaryExpressionRet, $bo);
         $preUnaryExpressionRet.setLine($line);
     }) |
     ae = accessExpression
     {
-        $preUnaryExpressionRet = new UnaryExpression($ae.accessExpressionRet, $bo);
-        $preUnaryExpressionRet.setLine($line);
+        $preUnaryExpressionRet = $ae.accessExpressionRet;
     };
 
 

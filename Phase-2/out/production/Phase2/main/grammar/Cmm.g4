@@ -130,6 +130,7 @@ loopCondBody returns[Statement loopCondBodyRet]:
 blockStatement returns[BlockStmt blockStatementRet]:
     {$blockStatementRet = new BlockStmt();}
     bg = BEGIN {
+    System.out.println($bg.getLine());
     $blockStatementRet.setLine($bg.getLine());
     }
      (NEWLINE+ (ss = singleStatement {
@@ -137,7 +138,10 @@ blockStatement returns[BlockStmt blockStatementRet]:
      } SEMICOLON)*
      ss = singleStatement {
      $blockStatementRet.addStatement($ss.singleStatementRet);
-     } (SEMICOLON)?)+ NEWLINE+ END;
+     } (SEMICOLON)?)+ NEWLINE+ END
+     {
+     System.out.println("skd");
+     System.out.println($blockStatementRet.getLine());};
 
 //todo
 varDecStatement returns[VarDecStmt varDecStatementRet] :

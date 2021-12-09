@@ -40,8 +40,21 @@ structDeclaration returns[StructDeclaration structDeclarationRet]:
       (NEWLINE+ b2 = singleStatementStructBody SEMICOLON? {$structDeclarationRet.setBody($b2.singleStatementStructBodyRet);})) NEWLINE+;
 
 //todo
-singleVarWithGetAndSet :
-    type identifier functionArgsDec BEGIN NEWLINE+ setBody getBody END;
+singleVarWithGetAndSet returns[SetGetVarDeclaration singleVarWithGetAndSetRet]:
+    {$singleVarWithGetAndSetRet = new SetGetVarDeclaration();}
+    t = type
+    {$singleVarWithGetAndSetRet.setVarType($t.typeRet);}
+    id = identifier
+    {$singleVarWithGetAndSetRet.setVarName($id.identifierRet);
+    $singleVarWithGetAndSetRet.setLine($id.line);}
+    fa = functionArgsDec
+    {$singleVarWithGetAndSetRet.setArgs($fa.functionArgsDecRet);}
+    BEGIN NEWLINE+
+    sb = setBody
+    {$singleVarWithGetAndSetRet.setSetterBody($sb.setBodyRet);}
+    gb = getBody
+    {$singleVarWithGetAndSetRet.setGetterBody($gb.getBodyRet);}
+    END;
 
 //todo
 singleStatementStructBody returns[BlockStmt singleStatementStructBodyRet] :
@@ -52,12 +65,12 @@ structBody returns[Statement strcutBodyRet] :
     (NEWLINE+ (singleStatementStructBody SEMICOLON)* singleStatementStructBody SEMICOLON?)+;
 
 //todo
-getBody :
-    GET body NEWLINE+;
+getBody returns[Statement getBodyRet] :
+    GET bd = body {$getBodyRet = $bd.bodyRet;} NEWLINE+;
 
 //todo
-setBody :
-    SET body NEWLINE+;
+setBody returns[Statement setBodyRet] :
+    SET bd = body {$setBodyRet = $bd.bodyRet;} NEWLINE+;
 
 //todo
 functionDeclaration returns[FunctionDeclaration functionDeclarationRet]:
@@ -105,12 +118,27 @@ blockStatement returns[BlockStmt blockStatementRet]:
      ss = singleStatement {$blockStatementRet.addStatement($ss.singleStatementRet);} (SEMICOLON)?)+ NEWLINE+ END;
 
 //todo
-varDecStatement returns [VarDecStmt varDecStatementRet] :
-    type identifier (ASSIGN orExpression )? (COMMA identifier (ASSIGN orExpression)? )*;
+varDecStatement returns[VarDecStmt varDecStatementRet] :
+    {
+    $varDecStatementRet = new VarDecStmt();
+    ArrayList<VariableDeclaration> vars = new ArrayList<>();
+    }
+    tp = type id = identifier (ASSIGN oe = orExpression{
+        VariableDeclaration vd = new VariableDeclaration($id.identifierRet, $tp.typeRet);
+        vd.setDefaultValue($oe.orExpressionRet);
+        vars.add(vd);
+    })? (COMMA id = identifier (ASSIGN oe = orExpression)?
+    {
+        VariableDeclaration vd = new VariableDeclaration($id.identifierRet, $tp.typeRet);
+        vd.setDefaultValue($oe.orExpressionRet);
+    })*
+    {VarDecStatementRet.setVars(vd);}
+    ;
 
 //todo
-functionCallStmt :
-     otherExpression ((LPAR functionArguments RPAR) | (DOT identifier))* (LPAR functionArguments RPAR);
+functionCallStmt returns[FunctionCallStmt functionCallStmtRet]:
+//    {functionCallStmtRet = new FunctionCallStmt();}
+     oe = otherExpression ((LPAR fa = functionArguments RPAR) | (DOT identifier))* (LPAR functionArguments RPAR);
 
 //todo
 returnStatement :

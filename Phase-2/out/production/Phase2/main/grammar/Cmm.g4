@@ -40,8 +40,21 @@ structDeclaration returns[StructDeclaration structDeclarationRet]:
       (NEWLINE+ b2 = singleStatementStructBody SEMICOLON? {$structDeclarationRet.setBody($b2.singleStatementStructBodyRet);})) NEWLINE+;
 
 //todo
-singleVarWithGetAndSet :
-    type identifier functionArgsDec BEGIN NEWLINE+ setBody getBody END;
+singleVarWithGetAndSet returns[SetGetVarDeclaration singleVarWithGetAndSetRet]:
+    {$singleVarWithGetAndSetRet = new SetGetVarDeclaration();}
+    t = type
+    {$singleVarWithGetAndSetRet.setVarType($t.typeRet);}
+    id = identifier
+    {$singleVarWithGetAndSetRet.setVarName($id.identifierRet);
+    $singleVarWithGetAndSetRet.setLine($id.line);}
+    fa = functionArgsDec
+    {$singleVarWithGetAndSetRet.setArgs($fa.functionArgsDecRet);}
+    BEGIN NEWLINE+
+    sb = setBody
+    {$singleVarWithGetAndSetRet.setSetterBody($sb.setBodyRet);}
+    gb = getBody
+    {$singleVarWithGetAndSetRet.setGetterBody($gb.getBodyRet);}
+    END;
 
 //todo
 singleStatementStructBody returns[BlockStmt singleStatementStructBodyRet] :
@@ -52,12 +65,12 @@ structBody returns[Statement strcutBodyRet] :
     (NEWLINE+ (singleStatementStructBody SEMICOLON)* singleStatementStructBody SEMICOLON?)+;
 
 //todo
-getBody :
-    GET body NEWLINE+;
+getBody returns[Statement getBodyRet] :
+    GET bd = body {$getBodyRet = $bd.bodyRet;} NEWLINE+;
 
 //todo
-setBody :
-    SET body NEWLINE+;
+setBody returns[Statement setBodyRet] :
+    SET bd = body {$setBodyRet = $bd.bodyRet;} NEWLINE+;
 
 //todo
 functionDeclaration returns[FunctionDeclaration functionDeclarationRet]:
@@ -292,7 +305,6 @@ append returns [Expression appendRet]:
 value returns[Value valueRet]:
     bv = boolValue {$valueRet = $bv.boolValueRet;} |
     i = INT_VALUE {$valueRet = new IntValue($i.int);};
-//    i = INT_VALUE {$valueRet = new IntValue(integer.valueOf($i.text).intValue());};
 
 //todo
 boolValue returns [BoolValue boolValueRet]:

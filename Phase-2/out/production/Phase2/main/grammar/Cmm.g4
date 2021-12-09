@@ -415,11 +415,21 @@ identifier returns[Identifier identifierRet, int line]:
 
 //todo
 type returns[Type typeRet]:
-    INT | BOOL | LIST SHARP type | STRUCT identifier | fptrType;
+    INT {$typeRet = new IntType();} |
+    BOOL {$typeRet = new BoolType();} |
+    LIST SHARP t = type {$typeRet = new ListType($t.typeRet);} |
+    STRUCT i = identifier {$typeRet = new StructType($i.identifierRet);} |
+    ft = fptrType {$typeRet = $ft.fptrTypeRet;};
 
 //todo
-fptrType:
-    FPTR LESS_THAN (VOID | (type (COMMA type)*)) ARROW (type | VOID) GREATER_THAN;
+fptrType returns[FptrType fptrTypeRet]:
+    {$fptrTypeRet = new FptrType(new ArrayList<Type>(), new VoidType());}
+    FPTR LESS_THAN (VOID {$fptrTypeRet.addArgType(new VoidType());} |
+    (t = type {$fptrTypeRet.addArgType($t.typeRet);}
+    (COMMA tp = type {$fptrTypeRet.addArgType($tp.typeRet);})*)) ARROW
+    (tpp = type {$fptrTypeRet.setReturnType($tpp.typeRet);} |
+    VOID {$fptrTypeRet.addArgType(new VoidType());})
+    GREATER_THAN;
 
 MAIN: 'main';
 RETURN: 'return';

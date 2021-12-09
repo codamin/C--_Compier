@@ -8,6 +8,36 @@ import main.ast.nodes.expression.values.primitive.*;
 import main.ast.nodes.statement.*;
 import main.visitor.*;
 
+//private void print(Node node) {
+//        System.out.println("Line:" + node.getLine() + ":" + node.toString());
+//        }
+//
+//@Override
+//public Void visit(Program program) {
+//        print(program);
+//        for(StructDeclaration classDeclaration : program.getStructs()) {
+//        classDeclaration.accept(this);
+//        }
+//        return null;
+//        }
+//
+//@Override
+//public Void visit(StructDeclaration structDeclaration) {
+//        print(structDeclaration);
+//        structDeclaration.getStructName().accept(this);
+//
+//        for(FieldDeclaration fieldDeclaration : structDeclaration.getFields()) {
+//        fieldDeclaration.accept(this);
+//        }
+//        if(structDeclaration.getConstructor() != null) {
+//        structDeclaration.getConstructor().accept(this);
+//        }
+//        for(MethodDeclaration methodDeclaration : structDeclaration.getMethods()) {
+//        methodDeclaration.accept(this);
+//        }
+//        return null;
+//        }
+
 public class ASTTreePrinter extends Visitor<Void> {
     public void messagePrinter(int line, String message){
         System.out.println("Line " + line + ": " + message);
@@ -26,24 +56,37 @@ public class ASTTreePrinter extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionDeclaration functionDec) {
-        //todo
+        messagePrinter(functionDec.getLine(), functionDec.toString());
+        functionDec.getFunctionName().accept(this);
+        for (VariableDeclaration arg: functionDec.getArgs())
+            arg.accept(this);
+        functionDec.getBody().accept(this);
+//        functionDec.getReturnType().accept(this);
         return null;
     }
 
     @Override
     public Void visit(MainDeclaration mainDec) {
-        //todo
+        messagePrinter(mainDec.getLine(), mainDec.toString());
+        mainDec.getBody().accept(this);
         return null;
     }
 
     @Override
     public Void visit(VariableDeclaration variableDec) {
+        messagePrinter(variableDec.getLine(), variableDec.toString());
+        variableDec.getVarName().accept(this);
+//        variableDec.getVarType().accept(this);
+        variableDec.getDefaultValue().accept(this);
         //todo
         return null;
     }
 
     @Override
     public Void visit(StructDeclaration structDec) {
+        messagePrinter(structDec.getLine(), structDec.toString());
+        structDec.getStructName().accept(this);
+        structDec.getBody().accept(this);
         //todo
         return null;
     }

@@ -291,7 +291,8 @@ append returns [Expression appendRet]:
 //todo
 value returns[Value valueRet]:
     bv = boolValue {$valueRet = $bv.boolValueRet;} |
-    INT_VALUE {$valueRet = new IntValue(Integer.valueOf(INT_VALUE));};
+    i = INT_VALUE {$valueRet = new IntValue($i.int);};
+//    i = INT_VALUE {$valueRet = new IntValue(integer.valueOf($i.text).intValue());};
 
 //todo
 boolValue returns [BoolValue boolValueRet]:

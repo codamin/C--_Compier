@@ -1,4 +1,4 @@
-// Generated from /home/amin/Desktop/compiler/Phase-2/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
+// Generated from /home/ho/C--_Compier/Phase-2/src/main/grammar/Cmm.g4 by ANTLR 4.9.2
 package parsers;
 
      import main.ast.nodes.*;
@@ -3545,6 +3545,7 @@ public class CmmParser extends Parser {
 	public static class ValueContext extends ParserRuleContext {
 		public Value valueRet;
 		public BoolValueContext bv;
+		public Token i;
 		public BoolValueContext boolValue() {
 			return getRuleContext(BoolValueContext.class,0);
 		}
@@ -3588,8 +3589,8 @@ public class CmmParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(589);
-				match(INT_VALUE);
-				((ValueContext)_localctx).valueRet =  new IntValue(Integer.valueOf(INT_VALUE));
+				((ValueContext)_localctx).i = match(INT_VALUE);
+				((ValueContext)_localctx).valueRet =  new IntValue((((ValueContext)_localctx).i!=null?Integer.valueOf(((ValueContext)_localctx).i.getText()):0));
 				}
 				break;
 			default:

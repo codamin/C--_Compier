@@ -36,7 +36,8 @@ structDeclaration returns[StructDeclaration structDeclarationRet]:
     {$structDeclarationRet = new StructDeclaration();}
     s = STRUCT {$structDeclarationRet.setLine($s.getLine());}
     i = identifier {$structDeclarationRet.setStructName($i.identifierRet);}
-     ((BEGIN b1 = structBody {$structDeclarationRet.setBody($b1.structBodyRet);} NEWLINE+ END) |
+     ((bg = BEGIN b1 = structBody {$b1.structBodyRet.setLine($bg.getLine());
+      $structDeclarationRet.setBody($b1.structBodyRet);} NEWLINE+ END) |
       (NEWLINE+ b2 = singleStatementStructBody {$structDeclarationRet.setBody($b2.singleStatementStructBodyRet);} SEMICOLON?)) NEWLINE+;
 
 //todo
@@ -101,8 +102,11 @@ functionArgsDec returns[ArrayList<VariableDeclaration> functionArgsDecRet]:
     LPAR (t = type i = identifier
      {
      VariableDeclaration v1 = new VariableDeclaration($i.identifierRet, $t.typeRet);
+     v1.setLine($i.line);
      }
-      (COMMA t = type i = identifier {VariableDeclaration v2 = new VariableDeclaration($i.identifierRet, $t.typeRet);
+      (COMMA t = type i = identifier
+      {VariableDeclaration v2 = new VariableDeclaration($i.identifierRet, $t.typeRet);
+       v2.setLine($i.line);
         $functionArgsDecRet.add(v2);})*)? RPAR ;
 
 //todo
@@ -151,11 +155,13 @@ varDecStatement returns[VarDecStmt varDecStatementRet] :
         id = identifier (ASSIGN oe = orExpression {
         VariableDeclaration vd = new VariableDeclaration($id.identifierRet, $tp.typeRet);
         vd.setDefaultValue($oe.orExpressionRet);
+        vd.setLine($id.line);
         vars.add(vd);
         $varDecStatementRet.setLine($id.line);
     })? (COMMA id = identifier (ASSIGN oe = orExpression {
         VariableDeclaration vd = new VariableDeclaration($id.identifierRet, $tp.typeRet);
         vd.setDefaultValue($oe.orExpressionRet);
+        vd.setLine($id.line);
         vars.add(vd);
         $varDecStatementRet.setLine($id.line);
     })? )*
@@ -253,8 +259,8 @@ singleStatement returns[Statement singleStatementRet]:
     as = assignmentStatement {$singleStatementRet = $as.assignmentStatementRet;} |
     vd = varDecStatement {$singleStatementRet = $vd.varDecStatementRet;} |
     ls = loopStatement {$singleStatementRet = $ls.loopStatementRet;} |
-    ap = append {$singleStatementRet = new ListAppendStmt($ap.appendRet);} |
-    sz = size {$singleStatementRet = new ListSizeStmt($sz.sizeRet);};
+    ap = append {ListAppendStmt temp1 = new ListAppendStmt($ap.appendRet); temp1.setLine($ap.appendRet.getLine()); $singleStatementRet=temp1;} |
+    sz = size {ListSizeStmt temp2 = new ListSizeStmt($sz.sizeRet); temp2.setLine($sz.sizeRet.getLine()); $singleStatementRet=temp2;};
 
 //todo
 expression returns[Expression expressionRet]:
@@ -341,7 +347,7 @@ pur = preUnaryExpression
 preUnaryExpression returns[Expression preUnaryExpressionRet] locals[int line, UnaryOperator bo]:
     ((op = NOT {$bo = UnaryOperator.not; $line = $op.getLine();} |
     op = MINUS {$bo = UnaryOperator.minus; $line = $op.getLine();})
-    pue = preUnaryExpression 
+    pue = preUnaryExpression
     {
         System.out.println("one");
         System.out.println($bo == null);
@@ -398,7 +404,7 @@ append returns [ListAppend appendRet]:
 //todo
 value returns[Value valueRet]:
     bv = boolValue {$valueRet = $bv.boolValueRet;} |
-    i = INT_VALUE {$valueRet = new IntValue($i.int);};
+    i = INT_VALUE {$valueRet = new IntValue($i.int); $valueRet.setLine($i.getLine());};
 
 //todo
 boolValue returns [BoolValue boolValueRet]:

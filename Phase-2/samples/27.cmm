@@ -1,0 +1,3 @@
+main() begin
+    return a.c().b()[0].e.d[1]
+end

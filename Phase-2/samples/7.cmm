@@ -1,0 +1,8 @@
+struct a begin
+    int a
+    int c
+end
+
+main() begin
+    return 1
+end

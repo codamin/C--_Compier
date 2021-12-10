@@ -1,0 +1,14 @@
+Line 1: Program
+Line 1: StructDeclaration_a
+Line 1: Identifier_a
+Line 1: BlockStmt
+Line 2: VarDecStmt
+Line 2: VarDeclaration_a
+Line 2: Identifier_a
+Line 3: VarDecStmt
+Line 3: VarDeclaration_c
+Line 3: Identifier_c
+Line 6: MainDeclaration
+Line 6: BlockStmt
+Line 7: ReturnStmt
+Line 7: IntValue_1

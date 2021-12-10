@@ -382,6 +382,7 @@ public class CmmParser extends Parser {
 		public StructDeclaration structDeclarationRet;
 		public Token s;
 		public IdentifierContext i;
+		public Token bg;
 		public StructBodyContext b1;
 		public SingleStatementStructBodyContext b2;
 		public TerminalNode STRUCT() { return getToken(CmmParser.STRUCT, 0); }
@@ -392,8 +393,8 @@ public class CmmParser extends Parser {
 		public TerminalNode NEWLINE(int i) {
 			return getToken(CmmParser.NEWLINE, i);
 		}
-		public TerminalNode BEGIN() { return getToken(CmmParser.BEGIN, 0); }
 		public TerminalNode END() { return getToken(CmmParser.END, 0); }
+		public TerminalNode BEGIN() { return getToken(CmmParser.BEGIN, 0); }
 		public StructBodyContext structBody() {
 			return getRuleContext(StructBodyContext.class,0);
 		}
@@ -441,10 +442,11 @@ public class CmmParser extends Parser {
 				{
 				{
 				setState(135);
-				match(BEGIN);
+				((StructDeclarationContext)_localctx).bg = match(BEGIN);
 				setState(136);
 				((StructDeclarationContext)_localctx).b1 = structBody();
-				_localctx.structDeclarationRet.setBody(((StructDeclarationContext)_localctx).b1.structBodyRet);
+				((StructDeclarationContext)_localctx).b1.structBodyRet.setLine(((StructDeclarationContext)_localctx).bg.getLine());
+				      _localctx.structDeclarationRet.setBody(((StructDeclarationContext)_localctx).b1.structBodyRet);
 				setState(139); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
@@ -1142,6 +1144,7 @@ public class CmmParser extends Parser {
 				((FunctionArgsDecContext)_localctx).i = identifier();
 
 				     VariableDeclaration v1 = new VariableDeclaration(((FunctionArgsDecContext)_localctx).i.identifierRet, ((FunctionArgsDecContext)_localctx).t.typeRet);
+				     v1.setLine(((FunctionArgsDecContext)_localctx).i.line);
 				     
 				setState(261);
 				_errHandler.sync(this);
@@ -1156,6 +1159,7 @@ public class CmmParser extends Parser {
 					setState(256);
 					((FunctionArgsDecContext)_localctx).i = identifier();
 					VariableDeclaration v2 = new VariableDeclaration(((FunctionArgsDecContext)_localctx).i.identifierRet, ((FunctionArgsDecContext)_localctx).t.typeRet);
+					       v2.setLine(((FunctionArgsDecContext)_localctx).i.line);
 					        _localctx.functionArgsDecRet.add(v2);
 					}
 					}
@@ -1683,6 +1687,7 @@ public class CmmParser extends Parser {
 
 				        VariableDeclaration vd = new VariableDeclaration(((VarDecStatementContext)_localctx).id.identifierRet, ((VarDecStatementContext)_localctx).tp.typeRet);
 				        vd.setDefaultValue(((VarDecStatementContext)_localctx).oe.orExpressionRet);
+				        vd.setLine(((VarDecStatementContext)_localctx).id.line);
 				        vars.add(vd);
 				        _localctx.varDecStatementRet.setLine(((VarDecStatementContext)_localctx).id.line);
 				    
@@ -1711,6 +1716,7 @@ public class CmmParser extends Parser {
 
 					        VariableDeclaration vd = new VariableDeclaration(((VarDecStatementContext)_localctx).id.identifierRet, ((VarDecStatementContext)_localctx).tp.typeRet);
 					        vd.setDefaultValue(((VarDecStatementContext)_localctx).oe.orExpressionRet);
+					        vd.setLine(((VarDecStatementContext)_localctx).id.line);
 					        vars.add(vd);
 					        _localctx.varDecStatementRet.setLine(((VarDecStatementContext)_localctx).id.line);
 					    
@@ -2557,7 +2563,7 @@ public class CmmParser extends Parser {
 				{
 				setState(482);
 				((SingleStatementContext)_localctx).ap = append();
-				((SingleStatementContext)_localctx).singleStatementRet =  new ListAppendStmt(((SingleStatementContext)_localctx).ap.appendRet);
+				ListAppendStmt temp1 = new ListAppendStmt(((SingleStatementContext)_localctx).ap.appendRet); temp1.setLine(((SingleStatementContext)_localctx).ap.appendRet.getLine()); ((SingleStatementContext)_localctx).singleStatementRet = temp1;
 				}
 				break;
 			case 9:
@@ -2565,7 +2571,7 @@ public class CmmParser extends Parser {
 				{
 				setState(485);
 				((SingleStatementContext)_localctx).sz = size();
-				((SingleStatementContext)_localctx).singleStatementRet =  new ListSizeStmt(((SingleStatementContext)_localctx).sz.sizeRet);
+				ListSizeStmt temp2 = new ListSizeStmt(((SingleStatementContext)_localctx).sz.sizeRet); temp2.setLine(((SingleStatementContext)_localctx).sz.sizeRet.getLine()); ((SingleStatementContext)_localctx).singleStatementRet = temp2;
 				}
 				break;
 			}
@@ -3772,7 +3778,7 @@ public class CmmParser extends Parser {
 				{
 				setState(659);
 				((ValueContext)_localctx).i = match(INT_VALUE);
-				((ValueContext)_localctx).valueRet =  new IntValue((((ValueContext)_localctx).i!=null?Integer.valueOf(((ValueContext)_localctx).i.getText()):0));
+				((ValueContext)_localctx).valueRet =  new IntValue((((ValueContext)_localctx).i!=null?Integer.valueOf(((ValueContext)_localctx).i.getText()):0)); _localctx.valueRet.setLine(((ValueContext)_localctx).i.getLine());
 				}
 				break;
 			default:

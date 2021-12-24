@@ -3,15 +3,21 @@ package main.visitor.type;
 import main.ast.nodes.Program;
 import main.ast.nodes.declaration.*;
 import main.ast.nodes.declaration.struct.*;
+import main.ast.nodes.expression.Expression;
+import main.ast.nodes.expression.operators.BinaryOperator;
 import main.ast.nodes.statement.*;
 import main.ast.types.NoType;
 import main.ast.types.Type;
 import main.ast.types.primitives.BoolType;
-import main.compileError.typeError.ConditionNotBool;
+import main.ast.types.primitives.IntType;
+import main.compileError.typeError.*;
+import main.symbolTable.utils.graph.Graph;
 import main.visitor.Visitor;
 
+import javax.swing.plaf.nimbus.State;
+
 public class TypeChecker extends Visitor<Void> {
-    private final Graph<String> classHierarchy;
+//    private final Graph<String> strucyHierarchy;
     public ExpressionTypeChecker expressionTypeChecker;
     public StructDeclaration currentStruct;
     public FunctionDeclaration currentFunction;
@@ -59,13 +65,13 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(VariableDeclaration variableDec) {
-        //Todo
+        this.expressionTypeChecker.checkTypeValidation(variableDec.getVarType(), variableDec);
         return null;
     }
 
     @Override
     public Void visit(StructDeclaration structDec) {
-        //Todo
+        structDec.getBody().accept(this);
         return null;
     }
 
@@ -77,31 +83,58 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(AssignmentStmt assignmentStmt) {
-        //Todo
+        Type firstType = assignmentStmt.getLValue().accept(expressionTypeChecker);
+        Type secondType = assignmentStmt.getRValue().accept(expressionTypeChecker);
+        boolean isFirstLvalue = expressionTypeChecker.isLvalue(assignmentStmt.getLValue());
+        if(!isFirstLvalue) {
+            LeftSideNotLvalue exception = new LeftSideNotLvalue(assignmentStmt.getLine());
+            assignmentStmt.addError(exception);
+        }
+        boolean isSubtype = expressionTypeChecker.isFirstSubTypeOfSecond(secondType, firstType);
+        if(!isSubtype) {
+            UnsupportedOperandType exception = new UnsupportedOperandType(assignmentStmt.getLine(), BinaryOperator.assign.name());
+            assignmentStmt.addError(exception);
+        }
         return null;
     }
 
     @Override
     public Void visit(BlockStmt blockStmt) {
-        //Todo
+        for (Statement stmt : blockStmt.getStatements()) {
+            stmt.accept(this);
+        }
         return null;
     }
 
     @Override
     public Void visit(ConditionalStmt conditionalStmt) {
-        //Todo
+        Type condType = conditionalStmt.getCondition().accept(expressionTypeChecker);
+        if(!(condType instanceof BoolType || condType instanceof NoType)) {
+            ConditionNotBool exception = new ConditionNotBool(conditionalStmt.getLine());
+            conditionalStmt.addError(exception);
+        }
+        conditionalStmt.getThenBody().accept(this);
+        if(conditionalStmt.getElseBody() != null) {
+            conditionalStmt.getElseBody().accept(this);
+        }
         return null;
     }
 
     @Override
     public Void visit(FunctionCallStmt functionCallStmt) {
-        //Todo
+        expressionTypeChecker.setIsInMethodCallStmt(true);
+        functionCallStmt.getFunctionCall().accept(expressionTypeChecker);
+        expressionTypeChecker.setIsInMethodCallStmt(false);
         return null;
     }
 
     @Override
     public Void visit(DisplayStmt displayStmt) {
-        //Todo
+        Type type = displayStmt.getArg().accept(expressionTypeChecker);
+        if(!(type instanceof IntType || type instanceof BoolType || type instanceof NoType)) {
+            UnsupportedTypeForDisplay exception = new UnsupportedTypeForDisplay(displayStmt.getLine());
+            displayStmt.addError(exception);
+        }
         return null;
     }
 
@@ -110,10 +143,10 @@ public class TypeChecker extends Visitor<Void> {
         Type retType = returnStmt.getReturnedExpr().accept(expressionTypeChecker);
         Type actualRetType = this.currentFunction.getReturnType();
         if(!expressionTypeChecker.isFirstSubTypeOfSecond(retType, actualRetType)) {
-            ReturnValueNotMatchMethodReturnType exception = new ReturnValueNotMatchMethodReturnType(returnStmt);
+            //CHECK : Error Input GetLine
+            ReturnValueNotMatchFunctionReturnType exception = new ReturnValueNotMatchFunctionReturnType(returnStmt.getLine());
             returnStmt.addError(exception);
         }
-        return new RetConBrk(true, false);
         return null;
     }
 
@@ -129,19 +162,21 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(VarDecStmt varDecStmt) {
-        //Todo
+        for (VariableDeclaration variableDeclaration : varDecStmt.getVars()) {
+            variableDeclaration.accept(this);
+        }
         return null;
     }
 
     @Override
     public Void visit(ListAppendStmt listAppendStmt) {
-        //Todo
+        listAppendStmt.getListAppendExpr().accept(expressionTypeChecker);
         return null;
     }
 
     @Override
     public Void visit(ListSizeStmt listSizeStmt) {
-        //
+        listSizeStmt.getListSizeExpr().accept(expressionTypeChecker);
         return null;
     }
 }

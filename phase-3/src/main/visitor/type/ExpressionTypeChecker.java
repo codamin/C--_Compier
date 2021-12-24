@@ -16,6 +16,7 @@ import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.FunctionSymbolTableItem;
 import main.symbolTable.items.StructSymbolTableItem;
+import main.symbolTable.items.VariableSymbolTableItem;
 import main.visitor.Visitor;
 
 import javax.lang.model.type.NullType;
@@ -88,7 +89,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     public Type refineType(Type type) {
         typeValidationNumberOfErrors = 0;
-        this.checkTypeValidation(type, new NullValue());
+//        this.checkTypeValidation(type, new NullValue());
         if(typeValidationNumberOfErrors > 0)
             return new NoType();
         return type;
@@ -319,11 +320,11 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     @Override
     public Type visit(Identifier identifier) {
         try {
-            StructSymbolTableItem classSymbolTableItem = (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + this.currentClass.getStructName().getName());
+            StructSymbolTableItem classSymbolTableItem = (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + this.currentStruct.getStructName().getName());
             SymbolTable classSymbolTable = classSymbolTableItem.getStructSymbolTable();
             FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) classSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + this.currentFunction.getFunctionName().getName());
             SymbolTable methodSymbolTable = methodSymbolTableItem.getFunctionSymbolTable();
-            LocalVariableSymbolTableItem localVariableSymbolTableItem = (LocalVariableSymbolTableItem) methodSymbolTable.getItem(LocalVariableSymbolTableItem.START_KEY + identifier.getName());
+            VariableSymbolTableItem localVariableSymbolTableItem = (VariableSymbolTableItem) methodSymbolTable.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
             return this.refineType(localVariableSymbolTableItem.getType());
         } catch (ItemNotFoundException e) {
             VarNotDeclared exception = new VarNotDeclared(identifier.getLine(), identifier.getName());
@@ -356,13 +357,13 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 //            }
             if(indexErrored)
                 return new NoType();
-            if((listAccessByIndex.getIndex() instanceof IntValue) && !areAllSame && (((IntValue)listAccessByIndex.getIndex()).getConstant() < ((ListType)instanceType).getElementsTypes().size())) {
-                int index = ((IntValue)listAccessByIndex.getIndex()).getConstant();
-                return this.refineType(((ListType) instanceType).getElementsTypes().get(index).getType());
-            }
-            else {
-                return this.refineType(((ListType) instanceType).getElementsTypes().get(0).getType());
-            }
+//            if((listAccessByIndex.getIndex() instanceof IntValue) && (((IntValue)listAccessByIndex.getIndex()).getConstant() < ((ListType)instanceType).getElementsTypes().size())) {
+//                int index = ((IntValue)listAccessByIndex.getIndex()).getConstant();
+//                return this.refineType(((ListType) instanceType).getElementsTypes().get(index).getType());
+//            }
+//            else {
+//                return this.refineType(((ListType) instanceType).getElementsTypes().get(0).getType());
+//            }
         }
         else if(!(instanceType instanceof NoType)) {
             AccessByIndexOnNonList exception = new AccessByIndexOnNonList(listAccessByIndex.getLine());

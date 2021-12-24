@@ -374,7 +374,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(StructAccess structAccess) {
-        System.out.println("structAccess");
         boolean prevSeenNoneLvalue = this.seenNoneLvalue;
         Type instanceType = structAccess.getInstance().accept(this);
 //        if(structAccess.getInstance() instanceof ThisClass)

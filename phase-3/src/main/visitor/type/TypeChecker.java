@@ -57,6 +57,8 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(MainDeclaration mainDec) {
+        this.expressionTypeChecker.setCurrentFunction(null);
+        this.currentFunction = null;
         mainDec.getBody().accept(this);
         return null;
     }

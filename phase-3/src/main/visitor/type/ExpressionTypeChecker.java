@@ -56,12 +56,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         if(first instanceof NoType)
             return true;
         else if(first instanceof IntType || first instanceof BoolType) {
-            if(first == null) {
-                System.out.println("first is null");
-            }
-            if(second == null) {
-                System.out.println("second is null");
-            }
             return first.toString().equals(second.toString());
         }
         else if(first instanceof NullType)
@@ -173,6 +167,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             }
             else if(firstType instanceof NoType || secondType instanceof NoType)
                 return new NoType();
+
             if(firstType instanceof IntType || firstType instanceof BoolType)
                 if(firstType.toString().equals(secondType.toString()))
                     return new BoolType();
@@ -328,11 +323,18 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     @Override
     public Type visit(Identifier identifier) {
         try {
-            StructSymbolTableItem classSymbolTableItem = (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + this.currentStruct.getStructName().getName());
-            SymbolTable classSymbolTable = classSymbolTableItem.getStructSymbolTable();
-            FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) classSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + this.currentFunction.getFunctionName().getName());
+            System.out.println("one");
+            StructSymbolTableItem structSymbolTableItem = (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + this.currentStruct.getStructName().getName());
+            System.out.println("tne");
+            SymbolTable structSymbolTable = structSymbolTableItem.getStructSymbolTable();
+            System.out.println("the");
+            System.out.println(this.currentFunction.getFunctionName().getName());
+            FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) structSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + this.currentFunction.getFunctionName().getName());
+            System.out.println("ore");
             SymbolTable methodSymbolTable = methodSymbolTableItem.getFunctionSymbolTable();
+            System.out.println("free");
             VariableSymbolTableItem localVariableSymbolTableItem = (VariableSymbolTableItem) methodSymbolTable.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
+            System.out.println("osxne");
             return this.refineType(localVariableSymbolTableItem.getType());
         } catch (ItemNotFoundException e) {
             VarNotDeclared exception = new VarNotDeclared(identifier.getLine(), identifier.getName());
@@ -378,6 +380,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         Type instanceType = structAccess.getInstance().accept(this);
 //        if(structAccess.getInstance() instanceof ThisClass)
 //            this.seenNoneLvalue = prevSeenNoneLvalue;
+        System.out.println(instanceType.toString());
         String memberName = structAccess.getElement().getName();
         if(instanceType instanceof NoType)
             return new NoType();

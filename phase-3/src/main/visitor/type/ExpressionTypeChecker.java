@@ -22,18 +22,18 @@ import javax.lang.model.type.NullType;
 import java.util.ArrayList;
 
 public class ExpressionTypeChecker extends Visitor<Type> {
-    private StructDeclaration currentClass;
+    private StructDeclaration currentStruct;
     private FunctionDeclaration currentFunction;
     private int typeValidationNumberOfErrors;
     private boolean seenNoneLvalue = false;
     private boolean isInMethodCallStmt = false;
 
-    public void setCurrentClass(StructDeclaration currentClass) {
-        this.currentClass = currentClass;
+    public void setCurrentStruct(StructDeclaration currentStruct) {
+        this.currentStruct = currentStruct;
     }
 
-    public void setCurrentMethod(FunctionDeclaration currentMethod) {
-        this.currentFunction = currentMethod;
+    public void setCurrentFunction(FunctionDeclaration currentFunction) {
+        this.currentFunction = currentFunction;
     }
 
     public void setIsInMethodCallStmt(boolean inIsMethodCallStmt) {
@@ -86,57 +86,35 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         return false;
     }
 
-//    public Type refineType(Type type) {
-//        typeValidationNumberOfErrors = 0;
-//        this.checkTypeValidation(type, new NullValue());
-//        if(typeValidationNumberOfErrors > 0)
-//            return new NoType();
-//        return type;
-//    }
+    public Type refineType(Type type) {
+        typeValidationNumberOfErrors = 0;
+        this.checkTypeValidation(type, new NullValue());
+        if(typeValidationNumberOfErrors > 0)
+            return new NoType();
+        return type;
+    }
 
     public void checkTypeValidation(Type type, Node node) {
         if(!(type instanceof StructType || type instanceof FptrType || type instanceof ListType))
             return;
-        if(type instanceof ListType) {
-            Type arryType = ((ListType) type).getType();
-//            if(types.size() == 0) {
-//                CannotHaveEmptyList exception = new CannotHaveEmptyList(node.getLine());
+//        if(type instanceof StructType) {
+//            String className = ((StructType)type).getStructName().getName();
+//            SymbolTable classSymbolTable;
+//            try {
+//                classSymbolTable = ((StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + className)).getStructSymbolTable();
+//            } catch (ItemNotFoundException classNotFound) {
+//                return new NoType();
+//            }
+//            if(!this.classHierarchy.doesGraphContainNode(className)) {
+//                ClassNotDeclared exception = new ClassNotDeclared(node.getLine(), className);
 //                node.addError(exception);
 //                typeValidationNumberOfErrors += 1;
-//                return;
 //            }
-            boolean flag = false;
-            for(int i = 0; i < types.size()-1; i++) {
-                for(int j = i+1; j < types.size(); j++) {
-                    String first = types.get(i).getName().getName();
-                    String second = types.get(j).getName().getName();
-                    if(first.equals("") || second.equals(""))
-                        continue;
-                    if(first.equals(second)) {
-                        DuplicateListId exception = new DuplicateListId(node.getLine());
-                        node.addError(exception);
-                        typeValidationNumberOfErrors += 1;
-                        flag = true;
-                        break;
-                    }
-                }
-                if(flag)
-                    break;
-            }
-            for(ListNameType listNameType : types)
-                this.checkTypeValidation(listNameType.getType(), node);
-        }
-        if(type instanceof ClassType) {
-            String className = ((ClassType)type).getClassName().getName();
-            if(!this.classHierarchy.doesGraphContainNode(className)) {
-                ClassNotDeclared exception = new ClassNotDeclared(node.getLine(), className);
-                node.addError(exception);
-                typeValidationNumberOfErrors += 1;
-            }
-        }
+//        }
+        // Check Here!!!
         if(type instanceof FptrType) {
             Type retType = ((FptrType) type).getReturnType();
-            ArrayList<Type> argsType = ((FptrType) type).getArgumentsTypes();
+            ArrayList<Type> argsType = ((FptrType) type).getArgsType();
             this.checkTypeValidation(retType, node);
             for(Type argType : argsType)
                 this.checkTypeValidation(argType, node);
@@ -317,11 +295,11 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             return new NoType();
         }
         else {
-            ArrayList<Type> actualArgsTypes = ((FptrType) instanceType).getArgumentsTypes();
+            ArrayList<Type> actualArgsTypes = ((FptrType) instanceType).getArgsType();
             Type returnType = ((FptrType) instanceType).getReturnType();
             boolean hasError = false;
             if(!isInMethodCallStmt && (returnType instanceof NullType)) {
-                CantUseValueOfVoidMethod exception = new CantUseValueOfVoidMethod(methodCall.getLine());
+                CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
                 funcCall.addError(exception);
                 hasError = true;
             }
@@ -331,8 +309,8 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 return this.refineType(returnType);
             }
             else {
-                MethodCallNotMatchDefinition exception = new MethodCallNotMatchDefinition(methodCall.getLine());
-                methodCall.addError(exception);
+                ArgsInFunctionCallNotMatchDefinition exception = new ArgsInFunctionCallNotMatchDefinition(funcCall.getLine());
+                funcCall.addError(exception);
                 return new NoType();
             }
         }
@@ -341,11 +319,11 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     @Override
     public Type visit(Identifier identifier) {
         try {
-            StructSymbolTableItem classSymbolTableItem = (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + this.currentClass.getStructName().getName(), true);
+            StructSymbolTableItem classSymbolTableItem = (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + this.currentClass.getStructName().getName());
             SymbolTable classSymbolTable = classSymbolTableItem.getStructSymbolTable();
-            FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) classSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + this.currentMethod.getMethodName().getName(), true);
-            SymbolTable methodSymbolTable = methodSymbolTableItem.getMethodSymbolTable();
-            LocalVariableSymbolTableItem localVariableSymbolTableItem = (LocalVariableSymbolTableItem) methodSymbolTable.getItem(LocalVariableSymbolTableItem.START_KEY + identifier.getName(), true);
+            FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) classSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + this.currentFunction.getFunctionName().getName());
+            SymbolTable methodSymbolTable = methodSymbolTableItem.getFunctionSymbolTable();
+            LocalVariableSymbolTableItem localVariableSymbolTableItem = (LocalVariableSymbolTableItem) methodSymbolTable.getItem(LocalVariableSymbolTableItem.START_KEY + identifier.getName());
             return this.refineType(localVariableSymbolTableItem.getType());
         } catch (ItemNotFoundException e) {
             VarNotDeclared exception = new VarNotDeclared(identifier.getLine(), identifier.getName());
@@ -387,7 +365,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             }
         }
         else if(!(instanceType instanceof NoType)) {
-            ListAccessByIndexOnNoneList exception = new ListAccessByIndexOnNoneList(listAccessByIndex.getLine());
+            AccessByIndexOnNonList exception = new AccessByIndexOnNonList(listAccessByIndex.getLine());
             listAccessByIndex.addError(exception);
         }
         return new NoType();

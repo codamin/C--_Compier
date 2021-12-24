@@ -11,6 +11,7 @@ import main.ast.nodes.expression.values.primitive.IntValue;
 import main.ast.types.*;
 import main.ast.types.primitives.BoolType;
 import main.ast.types.primitives.IntType;
+import main.ast.types.primitives.VoidType;
 import main.compileError.typeError.*;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
@@ -353,15 +354,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             indexErrored = true;
         }
         if(instanceType instanceof ListType) {
-//            ArrayList<Type> types = new ArrayList<>();
-//            for(ListNameType listNameType : ((ListType)instanceType).getElementsTypes())
-//                types.add(listNameType.getType());
-//            boolean areAllSame = this.areAllSameType(types);
-//            if(!(listAccessByIndex.getIndex() instanceof IntValue) && !areAllSame) {
-//                CantUseExprAsIndexOfMultiTypeList exception = new CantUseExprAsIndexOfMultiTypeList(listAccessByIndex.getLine());
-//                listAccessByIndex.addError(exception);
-//                return new NoType();
-//            }
+            Type lt = ((ListType) instanceType).getType();
             if(indexErrored)
                 return new NoType();
 //            if((listAccessByIndex.getIndex() instanceof IntValue) && (((IntValue)listAccessByIndex.getIndex()).getConstant() < ((ListType)instanceType).getElementsTypes().size())) {
@@ -381,76 +374,89 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(StructAccess structAccess) {
-//        System.out.println("structAccess");
-//        structAccess.getElement().accept(this);
-//        structAccess.getInstance().accept(this);
+        System.out.println("structAccess");
         boolean prevSeenNoneLvalue = this.seenNoneLvalue;
         Type instanceType = structAccess.getInstance().accept(this);
-        if(structAccess.getInstance() instanceof ThisClass)
-            this.seenNoneLvalue = prevSeenNoneLvalue;
-        String memberName = objectOrListMemberAccess.getMemberName().getName();
+//        if(structAccess.getInstance() instanceof ThisClass)
+//            this.seenNoneLvalue = prevSeenNoneLvalue;
+        String memberName = structAccess.getElement().getName();
         if(instanceType instanceof NoType)
             return new NoType();
-        else if(instanceType instanceof ClassType) {
-            String className = ((ClassType) instanceType).getClassName().getName();
+        else if(instanceType instanceof StructType) {
+            String structName = ((StructType) instanceType).getStructName().getName();
             SymbolTable classSymbolTable;
             try {
-                classSymbolTable = ((ClassSymbolTableItem) SymbolTable.root.getItem(ClassSymbolTableItem.START_KEY + className, true)).getClassSymbolTable();
+                classSymbolTable = ((StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + structName)).getStructSymbolTable();
             } catch (ItemNotFoundException classNotFound) {
                 return new NoType();
             }
             try {
-                FieldSymbolTableItem fieldSymbolTableItem = (FieldSymbolTableItem) classSymbolTable.getItem(FieldSymbolTableItem.START_KEY + memberName, true);
+                VariableSymbolTableItem fieldSymbolTableItem = (VariableSymbolTableItem) classSymbolTable.getItem(VariableSymbolTableItem.START_KEY + memberName);
                 return this.refineType(fieldSymbolTableItem.getType());
             } catch (ItemNotFoundException memberNotField) {
                 try {
-                    MethodSymbolTableItem methodSymbolTableItem = (MethodSymbolTableItem) classSymbolTable.getItem(MethodSymbolTableItem.START_KEY + memberName, true);
+                    FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) classSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + memberName);
                     this.seenNoneLvalue = true;
                     return new FptrType(methodSymbolTableItem.getArgTypes(), methodSymbolTableItem.getReturnType());
                 } catch (ItemNotFoundException memberNotFound) {
-                    if(memberName.equals(className)) {
+                    if(memberName.equals(structName)) {
                         this.seenNoneLvalue = true;
-                        return new FptrType(new ArrayList<>(), new NullType());
+                        return new FptrType(new ArrayList<>(), new VoidType());
                     }
-                    MemberNotAvailableInClass exception = new MemberNotAvailableInClass(objectOrListMemberAccess.getLine(), memberName, className);
-                    objectOrListMemberAccess.addError(exception);
+                    StructMemberNotFound exception = new StructMemberNotFound(structAccess.getLine(), memberName, structName);
+                    structAccess.addError(exception);
                     return new NoType();
                 }
             }
         }
-        else if(instanceType instanceof ListType) {
-            ArrayList<ListNameType> elementsTypes = ((ListType) instanceType).getElementsTypes();
-            for(ListNameType elementType : elementsTypes) {
-                if(elementType.getName().getName().equals(memberName))
-                    return this.refineType(elementType.getType());
-            }
-            ListMemberNotFound exception = new ListMemberNotFound(objectOrListMemberAccess.getLine(), memberName);
-            objectOrListMemberAccess.addError(exception);
-            return new NoType();
-        }
         else {
-            MemberAccessOnNoneObjOrListType exception = new MemberAccessOnNoneObjOrListType(objectOrListMemberAccess.getLine());
-            objectOrListMemberAccess.addError(exception);
+            AccessOnNonStruct exception = new AccessOnNonStruct(structAccess.getLine());
+            structAccess.addError(exception);
             return new NoType();
         }
-        return null;
     }
 
     @Override
     public Type visit(ListSize listSize) {
         System.out.println("listSize");
-        return null;
+        Type at = listSize.getArg().accept(this);
+        if(at instanceof NoType) {
+            return new NoType();
+        }
+        if(!(at instanceof ListType)) {
+            GetSizeOfNonList exception = new GetSizeOfNonList(listSize.getLine());
+            listSize.addError(exception);
+            return new NoType();
+        }
+        return new IntType();
     }
 
     @Override
     public Type visit(ListAppend listAppend) {
         System.out.println("listAppend");
-        return null;
+        // Do we need to check the availability of listName? and does listArg cast to its type for accept(this) ?
+        Type lat = listAppend.getListArg().accept(this);
+        Type eat = listAppend.getElementArg().accept(this);
+        if(lat instanceof NoType || eat instanceof NoType) {
+            return new NoType();
+        }
+        if(!(lat instanceof ListType)) {
+            AppendToNonList exception = new AppendToNonList(listAppend.getLine());
+            listAppend.addError(exception);
+            return new NoType();
+        }
+        if(!isFirstSubTypeOfSecond(((ListType)lat).getType(), eat)) {
+            NewElementTypeNotMatchListType exception = new NewElementTypeNotMatchListType(listAppend.getLine());
+            listAppend.addError(exception);
+            return new NoType();
+        }
+        return new ListType(eat);
     }
 
     @Override
     public Type visit(ExprInPar exprInPar) {
-        System.out.println("exprInPar");
+        this.seenNoneLvalue = true;
+//        return new Expression();
         return null;
     }
 

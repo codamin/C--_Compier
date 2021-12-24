@@ -233,6 +233,7 @@ public class ASTTreePrinter extends Visitor<Void> {
     public Void visit(ListAccessByIndex listAccessByIndex) {
         messagePrinter(listAccessByIndex.getLine(), listAccessByIndex.toString());
         listAccessByIndex.getInstance().accept(this);
+        listAccessByIndex.getIndex().accept(this);
         //todo
         return null;
     }

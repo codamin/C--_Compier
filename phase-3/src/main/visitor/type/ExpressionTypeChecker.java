@@ -54,8 +54,15 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     public boolean isFirstSubTypeOfSecond(Type first, Type second) {
         if(first instanceof NoType)
             return true;
-        else if(first instanceof IntType || first instanceof BoolType)
+        else if(first instanceof IntType || first instanceof BoolType) {
+            if(first == null) {
+                System.out.println("first is null");
+            }
+            if(second == null) {
+                System.out.println("second is null");
+            }
             return first.toString().equals(second.toString());
+        }
         else if(first instanceof NullType)
             return second instanceof NullType || second instanceof FptrType || second instanceof StructType;
         else if(first instanceof StructType) {
@@ -374,25 +381,76 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(StructAccess structAccess) {
-        //Todo
+//        System.out.println("structAccess");
+//        structAccess.getElement().accept(this);
+//        structAccess.getInstance().accept(this);
+        boolean prevSeenNoneLvalue = this.seenNoneLvalue;
+        Type instanceType = structAccess.getInstance().accept(this);
+        if(structAccess.getInstance() instanceof ThisClass)
+            this.seenNoneLvalue = prevSeenNoneLvalue;
+        String memberName = objectOrListMemberAccess.getMemberName().getName();
+        if(instanceType instanceof NoType)
+            return new NoType();
+        else if(instanceType instanceof ClassType) {
+            String className = ((ClassType) instanceType).getClassName().getName();
+            SymbolTable classSymbolTable;
+            try {
+                classSymbolTable = ((ClassSymbolTableItem) SymbolTable.root.getItem(ClassSymbolTableItem.START_KEY + className, true)).getClassSymbolTable();
+            } catch (ItemNotFoundException classNotFound) {
+                return new NoType();
+            }
+            try {
+                FieldSymbolTableItem fieldSymbolTableItem = (FieldSymbolTableItem) classSymbolTable.getItem(FieldSymbolTableItem.START_KEY + memberName, true);
+                return this.refineType(fieldSymbolTableItem.getType());
+            } catch (ItemNotFoundException memberNotField) {
+                try {
+                    MethodSymbolTableItem methodSymbolTableItem = (MethodSymbolTableItem) classSymbolTable.getItem(MethodSymbolTableItem.START_KEY + memberName, true);
+                    this.seenNoneLvalue = true;
+                    return new FptrType(methodSymbolTableItem.getArgTypes(), methodSymbolTableItem.getReturnType());
+                } catch (ItemNotFoundException memberNotFound) {
+                    if(memberName.equals(className)) {
+                        this.seenNoneLvalue = true;
+                        return new FptrType(new ArrayList<>(), new NullType());
+                    }
+                    MemberNotAvailableInClass exception = new MemberNotAvailableInClass(objectOrListMemberAccess.getLine(), memberName, className);
+                    objectOrListMemberAccess.addError(exception);
+                    return new NoType();
+                }
+            }
+        }
+        else if(instanceType instanceof ListType) {
+            ArrayList<ListNameType> elementsTypes = ((ListType) instanceType).getElementsTypes();
+            for(ListNameType elementType : elementsTypes) {
+                if(elementType.getName().getName().equals(memberName))
+                    return this.refineType(elementType.getType());
+            }
+            ListMemberNotFound exception = new ListMemberNotFound(objectOrListMemberAccess.getLine(), memberName);
+            objectOrListMemberAccess.addError(exception);
+            return new NoType();
+        }
+        else {
+            MemberAccessOnNoneObjOrListType exception = new MemberAccessOnNoneObjOrListType(objectOrListMemberAccess.getLine());
+            objectOrListMemberAccess.addError(exception);
+            return new NoType();
+        }
         return null;
     }
 
     @Override
     public Type visit(ListSize listSize) {
-        //Todo
+        System.out.println("listSize");
         return null;
     }
 
     @Override
     public Type visit(ListAppend listAppend) {
-        //Todo
+        System.out.println("listAppend");
         return null;
     }
 
     @Override
     public Type visit(ExprInPar exprInPar) {
-        //Todo
+        System.out.println("exprInPar");
         return null;
     }
 

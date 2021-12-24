@@ -29,19 +29,17 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(Program program) {
-        boolean mainCheck = false;
+        for(FunctionDeclaration functionDeclaration : program.getFunctions()) {
+            this.expressionTypeChecker.setCurrentFunction(functionDeclaration);
+            this.currentFunction = functionDeclaration;
+            functionDeclaration.accept(this);
+        }
         for(StructDeclaration structDeclaration : program.getStructs()) {
             this.expressionTypeChecker.setCurrentStruct(structDeclaration);
             this.currentStruct = structDeclaration;
             structDeclaration.accept(this);
-            if(structDeclaration.getStructName().getName().equals("Main")) {
-                mainCheck = true;
-            }
         }
-        // if(!mainCheck) {
-        //     NoMainClass exception = new NoMainClass();
-        //     program.addError(exception);
-        // }
+        program.getMain().accept(this);
         return null;
     }
 
@@ -59,7 +57,7 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(MainDeclaration mainDec) {
-        //Todo
+        mainDec.getBody().accept(this);
         return null;
     }
 

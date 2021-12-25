@@ -149,6 +149,17 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(SetGetVarDeclaration setGetVarDec) {
+        System.out.println(setGetVarDec.getVarDec().getVarType() + "858585858585858585858585858585858");
+        setGetVarDec.getVarDec().accept(this);
+/////////////////////////////////////////////////////////////////////////////////////
+        try {
+            VariableSymbolTableItem variableSymbolTableItem =
+                    (VariableSymbolTableItem) SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + setGetVarDec.getVarName().getName());
+            System.out.println(variableSymbolTableItem.getType() + "***********************************88888888888888889999999999");
+        } catch (ItemNotFoundException e) {
+            e.printStackTrace();
+        }
+/////////////////////////////////////////////////////////////////////////////////////
         try {
             FunctionSymbolTableItem functionSymbolTableItem =
                     (FunctionSymbolTableItem) SymbolTable.top.getItem(FunctionSymbolTableItem.START_KEY + setGetVarDec.getVarName().getName());

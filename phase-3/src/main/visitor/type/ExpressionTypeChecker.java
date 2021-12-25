@@ -341,19 +341,10 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     @Override
     public Type visit(Identifier identifier) {
         System.out.println(identifier.toString());
-//        try {
-//            FunctionSymbolTableItem functionSymbolTableItem =
-//                    (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
-//            return new FptrType(functionSymbolTableItem.getArgTypes(), functionSymbolTableItem.getReturnType());
-//        } catch (ItemNotFoundException e) {
-//            VarNotDeclared exception = new VarNotDeclared(identifier.getLine(), identifier.getName());
-//            identifier.addError(exception);
-//            return new NoType();
-//        }
         try {
             VariableSymbolTableItem symbolTableItem =
                     (VariableSymbolTableItem) SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
-//            System.out.println("checking in identifier ");
+            System.out.println("checking in identifier ");
 //            System.out.println(VariableSymbolTableItem.START_KEY + identifier.getName());
 //            System.out.println(symbolTableItem.getType());
             return symbolTableItem.getType();
@@ -361,6 +352,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             try {
                 FunctionSymbolTableItem functionSymbolTableItem =
                         (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
+                System.out.println("checking in identifier2222 ");
                 return new FptrType(functionSymbolTableItem.getArgTypes(), functionSymbolTableItem.getReturnType());
 
             } catch (ItemNotFoundException e2) {

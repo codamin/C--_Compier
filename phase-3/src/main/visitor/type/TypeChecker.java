@@ -30,6 +30,7 @@ public class TypeChecker extends Visitor<Void> {
     private boolean isInSet = false;
     private boolean isInGet = false;
     private boolean isInMain = false;
+    private boolean hasReturn = false;
     private Type currentGetSetVarType = null;
 
     public TypeChecker(){
@@ -51,7 +52,10 @@ public class TypeChecker extends Visitor<Void> {
             boolean prevIsInSet = this.isInSet;
             this.isInMain = false;
             this.isInSet = false;
+            boolean prevHasReturn = this.hasReturn;
+            this.hasReturn = false;
             functionDeclaration.accept(this);
+            this.hasReturn = prevHasReturn;
             this.isInMain = prevIsInMain;
             this.isInSet = prevIsInSet;
         }
@@ -62,12 +66,12 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(FunctionDeclaration functionDec) {
 //        this.expressionTypeChecker.checkTypeValidation(functionDec.getReturnType(), functionDec);
-        Type type = functionDec.getReturnType();
-        if(type instanceof StructType) {
+        Type retType = functionDec.getReturnType();
+        if(retType instanceof StructType) {
             try {
-                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + ((StructType) type).getStructName().getName());
+                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + ((StructType) retType).getStructName().getName());
             } catch (ItemNotFoundException classNotFound) {
-                StructNotDeclared exception = new StructNotDeclared(functionDec.getLine(), ((StructType) type).getStructName().getName());
+                StructNotDeclared exception = new StructNotDeclared(functionDec.getLine(), ((StructType) retType).getStructName().getName());
                 functionDec.addError(exception);
             }
         }
@@ -76,6 +80,10 @@ public class TypeChecker extends Visitor<Void> {
             varDeclaration.accept(this);
         }
         functionDec.getBody().accept(this);
+        if(!(retType instanceof VoidType) && !this.hasReturn) {
+            MissingReturnStatement exception = new MissingReturnStatement(functionDec.getLine(), functionDec.getFunctionName().getName());
+            functionDec.addError(exception);
+        }
         SymbolTable.pop();
         return null;
     }
@@ -258,6 +266,7 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(ReturnStmt returnStmt) {
+        this.hasReturn = true;
         System.out.println(returnStmt.getLine());
         if(this.currentFunction != null) {
             System.out.println("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK" + this.currentFunction.getFunctionName());
@@ -294,7 +303,9 @@ public class TypeChecker extends Visitor<Void> {
             ConditionNotBool exception = new ConditionNotBool(loopStmt.getLine());
             loopStmt.addError(exception);
         }
+        SymbolTable.push(new SymbolTable(SymbolTable.top));
         loopStmt.getBody().accept(this);
+        SymbolTable.pop();
         return null;
     }
 

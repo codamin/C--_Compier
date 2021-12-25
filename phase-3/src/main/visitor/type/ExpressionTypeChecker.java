@@ -167,33 +167,36 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         Type firstType = binaryExpression.getFirstOperand().accept(this);
         Type secondType = binaryExpression.getSecondOperand().accept(this);
         if((operator == BinaryOperator.eq)) {
-            if(firstType instanceof NoType && secondType instanceof NoType)
+            if (firstType instanceof NoType && secondType instanceof NoType) {
                 return new NoType();
-            else if((firstType instanceof NoType && secondType instanceof ListType) ||
-                    (secondType instanceof NoType && firstType instanceof ListType)) {
+            }
+            if(firstType instanceof ListType || secondType instanceof ListType) {
                 UnsupportedOperandType exception = new UnsupportedOperandType(binaryExpression.getLine(), operator.name());
                 binaryExpression.addError(exception);
                 return new NoType();
             }
-            else if(firstType instanceof NoType || secondType instanceof NoType)
+            else if(firstType instanceof NoType || secondType instanceof NoType) {
                 return new NoType();
+            }
 
-            if(firstType instanceof IntType || firstType instanceof BoolType)
-                if(firstType.toString().equals(secondType.toString()))
+            if(firstType instanceof IntType || firstType instanceof BoolType || firstType instanceof FptrType || firstType instanceof StructType) {
+                if (firstType.toString().equals(secondType.toString()))
                     return new BoolType();
-            if((firstType instanceof StructType && secondType instanceof NullType) ||
-                    (firstType instanceof NullType && secondType instanceof StructType) ||
-                    (firstType instanceof StructType && secondType instanceof StructType &&
-                            ((StructType)firstType).getStructName().getName().equals(((StructType)secondType).getStructName().getName()))) {
-                return new BoolType();
             }
-            if((firstType instanceof FptrType && secondType instanceof NullType) ||
-                    (firstType instanceof NullType && secondType instanceof FptrType) ||
-                    (firstType instanceof FptrType && secondType instanceof FptrType)) {
-                return new BoolType();
-            }
-            if(firstType instanceof NullType && secondType instanceof NullType)
-                return new BoolType();
+
+//            if((firstType instanceof StructType && secondType instanceof NullType) ||
+//                    (firstType instanceof NullType && secondType instanceof StructType) ||
+//                    (firstType instanceof StructType && secondType instanceof StructType &&
+//                            ((StructType)firstType).getStructName().getName().equals(((StructType)secondType).getStructName().getName()))) {
+//                return new BoolType();
+//            }
+//            if((firstType instanceof FptrType && secondType instanceof NullType) ||
+//                    (firstType instanceof NullType && secondType instanceof FptrType) ||
+//                    (firstType instanceof FptrType && secondType instanceof FptrType)) {
+//                return new BoolType();
+//            }
+//            if(firstType instanceof NullType && secondType instanceof NullType)
+//                return new BoolType();
         }
         if((operator == BinaryOperator.gt) || (operator == BinaryOperator.lt)) {
             if(firstType instanceof NoType && secondType instanceof NoType)
@@ -495,8 +498,11 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     @Override
     public Type visit(ExprInPar exprInPar) {
         this.seenNoneLvalue = true;
-//        return new Expression();
-        return null;
+        for(Expression eInPar : exprInPar.getInputs()) {
+            Type type = eInPar.accept(this);
+            return type;
+        }
+        return new NoType();
     }
 
     @Override

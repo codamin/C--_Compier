@@ -43,13 +43,11 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(Program program) {
         for(FunctionDeclaration functionDeclaration : program.getFunctions()) {
-            System.out.println("HIIII There Is is a function here");
             this.expressionTypeChecker.setCurrentFunction(functionDeclaration);
             this.currentFunction = functionDeclaration;
             functionDeclaration.accept(this);
         }
         for(StructDeclaration structDeclaration : program.getStructs()) {
-            System.out.println("HIIII There Is is a struct here");
 
             this.expressionTypeChecker.setCurrentStruct(structDeclaration);
             this.currentStruct = structDeclaration;
@@ -61,9 +59,16 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionDeclaration functionDec) {
-        System.out.println("^^^^^^^^^^^^$$$$$$$$############^^^^^^^^^^^^^##########^^^^^^^^^^^^^^$$$$$$$$$$" + functionDec.getReturnType());
-        this.expressionTypeChecker.checkTypeValidation(functionDec.getReturnType(), functionDec);
-
+//        this.expressionTypeChecker.checkTypeValidation(functionDec.getReturnType(), functionDec);
+        Type type = functionDec.getReturnType();
+        if(type instanceof StructType) {
+            try {
+                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + ((StructType) type).getStructName().getName());
+            } catch (ItemNotFoundException classNotFound) {
+                StructNotDeclared exception = new StructNotDeclared(functionDec.getLine(), ((StructType) type).getStructName().getName());
+                functionDec.addError(exception);
+            }
+        }
         SymbolTable.push(new SymbolTable());
         for(VariableDeclaration varDeclaration : functionDec.getArgs()) {
             varDeclaration.accept(this);
@@ -76,9 +81,7 @@ public class TypeChecker extends Visitor<Void> {
     public Void visit(MainDeclaration mainDec) {
         this.expressionTypeChecker.setCurrentFunction(mainDec);
         this.currentFunction = mainDec;
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         SymbolTable.push(new SymbolTable());
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         mainDec.getBody().accept(this);
         return null;
     }
@@ -104,10 +107,8 @@ public class TypeChecker extends Visitor<Void> {
 
         if (variableDec.getVarType() instanceof StructType) {
             try {
-                System.out.println("in pos 1");
                 System.out.println(StructSymbolTableItem.START_KEY + ((StructType) variableDec.getVarType()).getStructName().getName());
-                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + ((StructType) variableDec.getVarType()).getStructName().getName());                    System.out.println("in pos 1");
-                System.out.println("in pos 2");
+                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + ((StructType) variableDec.getVarType()).getStructName().getName());
             } catch (ItemNotFoundException classNotFound) {
                 StructNotDeclared exception = new StructNotDeclared(variableDec.getLine(), variableDec.getVarType().toString());
                 variableDec.addError(exception);
@@ -116,10 +117,8 @@ public class TypeChecker extends Visitor<Void> {
 
 //FOR SYMBOL TABLE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         VariableSymbolTableItem variableSymbolTableItem = new VariableSymbolTableItem(variableDec.getVarName());
-        System.out.println("***********************************************************");
         variableSymbolTableItem.setType(variableDec.getVarType());
         System.out.println(variableSymbolTableItem.getType());
-        System.out.println("***********************************************************");
 
         try {
             SymbolTable.top.getItem(variableSymbolTableItem.getKey());
@@ -147,6 +146,9 @@ public class TypeChecker extends Visitor<Void> {
         setGetVarDec.getGetterBody().accept(this);
         isInGet = false;
 
+        for(VariableDeclaration variableDeclaration : setGetVarDec.getArgs()) {
+            variableDeclaration.accept(this);
+        }
         return null;
     }
 
@@ -185,6 +187,7 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(ConditionalStmt conditionalStmt) {
         Type condType = conditionalStmt.getCondition().accept(expressionTypeChecker);
+        System.out.println(condType);
         if(!(condType instanceof BoolType || condType instanceof NoType)) {
             ConditionNotBool exception = new ConditionNotBool(conditionalStmt.getLine());
             conditionalStmt.addError(exception);
@@ -208,7 +211,6 @@ public class TypeChecker extends Visitor<Void> {
     public Void visit(DisplayStmt displayStmt) {
         Type type = displayStmt.getArg().accept(expressionTypeChecker);
         if(!(type instanceof IntType || type instanceof BoolType || type instanceof NoType)) {
-            System.out.println("WE ARE IN UnsupportedTypeForDisplay ++++++++++++++++++++++++++++++++++++++++++++++++");
             UnsupportedTypeForDisplay exception = new UnsupportedTypeForDisplay(displayStmt.getLine());
             displayStmt.addError(exception);
         }

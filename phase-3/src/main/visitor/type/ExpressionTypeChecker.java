@@ -1,6 +1,7 @@
 package main.visitor.type;
 
 import main.ast.nodes.Node;
+import main.ast.nodes.Program;
 import main.ast.nodes.declaration.Declaration;
 import main.ast.nodes.declaration.FunctionDeclaration;
 import main.ast.nodes.declaration.MainDeclaration;
@@ -110,38 +111,38 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     public Type refineType(Type type) {
         typeValidationNumberOfErrors = 0;
-//        this.checkTypeValidation(type, );
+        this.checkTypeValidation(type, new IntValue(0));
         if(typeValidationNumberOfErrors > 0)
             return new NoType();
         return type;
     }
 
-    public void checkTypeValidation(Type type, Node node) {
+    public int checkTypeValidation(Type type, Node node) {
+        int ans = 0;
         if(!(type instanceof StructType || type instanceof FptrType || type instanceof ListType))
-            return;
-//        if(type instanceof StructType) {
-//            String className = ((StructType)type).getStructName().getName();
-//            SymbolTable classSymbolTable;
-//            try {
-//                classSymbolTable = ((StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + className)).getStructSymbolTable();
-//            } catch (ItemNotFoundException classNotFound) {
-//                return new NoType();
-//            }
-//            if(!this.classHierarchy.doesGraphContainNode(className)) {
-//                ClassNotDeclared exception = new ClassNotDeclared(node.getLine(), className);
-//                node.addError(exception);
-//                typeValidationNumberOfErrors += 1;
-//            }
-//        }
-        // Check Here!!!
-//        if(type instanceof FptrType) {
-//            System.out.println("FPRT RETURN TYPE VALUE***********************************************");
-//            Type retType = ((FptrType) type).getReturnType();
-//            ArrayList<Type> argsType = ((FptrType) type).getArgsType();
-//            this.checkTypeValidation(retType, node);
-//            for(Type argType : argsType)
-//                this.checkTypeValidation(argType, node);
-//        }
+            return ans;
+        if(type instanceof ListType) {
+            Type elementType = ((ListType) type).getType();
+            ans += this.checkTypeValidation(elementType, node);
+        }
+        if(type instanceof StructType) {
+            String className = ((StructType)type).getStructName().getName();
+            try {
+                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + className);
+            } catch (ItemNotFoundException classNotFound) {
+                StructNotDeclared exception = new StructNotDeclared(node.getLine(), className);
+                node.addError(exception);
+                ans += 1;
+            }
+        }
+        if(type instanceof FptrType) {
+            Type retType = ((FptrType) type).getReturnType();
+            ArrayList<Type> argsType = ((FptrType) type).getArgsType();
+            ans += this.checkTypeValidation(retType, node);
+            for(Type argType : argsType)
+                ans += this.checkTypeValidation(argType, node);
+        }
+        return ans;
     }
 
     public boolean areAllSameType(ArrayList<Type> types) {

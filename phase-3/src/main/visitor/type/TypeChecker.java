@@ -5,6 +5,7 @@ import main.ast.nodes.declaration.*;
 import main.ast.nodes.declaration.struct.*;
 import main.ast.nodes.expression.operators.BinaryOperator;
 import main.ast.nodes.statement.*;
+import main.ast.types.ListType;
 import main.ast.types.NoType;
 import main.ast.types.StructType;
 import main.ast.types.Type;
@@ -99,15 +100,10 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(VariableDeclaration variableDec) {
-        System.out.println(">>>>>>>>>>>>>>>>>>VariableDecleration " + variableDec.getVarName().getName());
         if(isInSet || isInGet) {
-            System.out.println("here is in getSet");
-            System.out.println(variableDec.getVarName());
             CannotUseDefineVar exception = new CannotUseDefineVar(variableDec.getLine());
             variableDec.addError(exception);
         }
-
-        this.expressionTypeChecker.checkTypeValidation(variableDec.getVarType(), variableDec);
 
         if(variableDec.getDefaultValue() != null) {
             Type defaultValType = variableDec.getDefaultValue().accept(expressionTypeChecker);
@@ -118,19 +114,11 @@ public class TypeChecker extends Visitor<Void> {
             }
         }
 
+        int numErrors = this.expressionTypeChecker.checkTypeValidation(variableDec.getVarType(), variableDec);
         Type finalType = variableDec.getVarType();
-
-        if (variableDec.getVarType() instanceof StructType) {
-            try {
-                System.out.println(StructSymbolTableItem.START_KEY + ((StructType) variableDec.getVarType()).getStructName().getName());
-                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + ((StructType) variableDec.getVarType()).getStructName().getName());
-            } catch (ItemNotFoundException classNotFound) {
-                StructNotDeclared exception = new StructNotDeclared(variableDec.getLine(), ((StructType) variableDec.getVarType()).getStructName().getName());
-                variableDec.addError(exception);
-                finalType = new NoType();
-            }
+        if(numErrors > 0) {
+            finalType = new NoType();
         }
-
 //FOR SYMBOL TABLE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         VariableSymbolTableItem variableSymbolTableItem = new VariableSymbolTableItem(variableDec.getVarName());
         variableSymbolTableItem.setType(finalType);
@@ -268,12 +256,6 @@ public class TypeChecker extends Visitor<Void> {
     public Void visit(ReturnStmt returnStmt) {
         this.hasReturn = true;
         System.out.println(returnStmt.getLine());
-        if(this.currentFunction != null) {
-            System.out.println("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK" + this.currentFunction.getFunctionName());
-        }
-        else {
-            System.out.println("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
-        }
         Type retType = returnStmt.getReturnedExpr().accept(expressionTypeChecker);
         if(isInSet || isInMain) {
             CannotUseReturn exception = new CannotUseReturn(returnStmt.getLine());

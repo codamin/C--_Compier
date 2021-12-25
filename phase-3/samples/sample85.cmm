@@ -1,13 +1,5 @@
-int foo() begin
-    int aa = 85;
-end
-
 main() begin
-int a = 2;
-if(2 == 2) begin
-    int b = 3;
-    if(4 == 4) begin
-        display(b);
-    end
-end
+list # list #list #list #struct A a;
+int b = true & false;
+list #list #fptr<list #struct a -> int> fprt1;
 end

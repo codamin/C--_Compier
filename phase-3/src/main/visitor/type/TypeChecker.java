@@ -7,20 +7,30 @@ import main.ast.nodes.expression.Expression;
 import main.ast.nodes.expression.operators.BinaryOperator;
 import main.ast.nodes.statement.*;
 import main.ast.types.NoType;
+import main.ast.types.StructType;
 import main.ast.types.Type;
 import main.ast.types.primitives.BoolType;
 import main.ast.types.primitives.IntType;
+import main.compileError.nameError.DuplicateVar;
+import main.compileError.nameError.VarFunctionConflict;
+import main.compileError.nameError.VarStructConflict;
 import main.compileError.typeError.*;
+import main.symbolTable.SymbolTable;
+import main.symbolTable.exceptions.ItemAlreadyExistsException;
+import main.symbolTable.exceptions.ItemNotFoundException;
+import main.symbolTable.items.FunctionSymbolTableItem;
+import main.symbolTable.items.StructSymbolTableItem;
+import main.symbolTable.items.VariableSymbolTableItem;
 import main.symbolTable.utils.graph.Graph;
 import main.visitor.Visitor;
-
-import javax.swing.plaf.nimbus.State;
 
 public class TypeChecker extends Visitor<Void> {
 //    private final Graph<String> strucyHierarchy;
     public ExpressionTypeChecker expressionTypeChecker;
-    public StructDeclaration currentStruct;
-    public FunctionDeclaration currentFunction;
+//    public StructDeclaration currentStruct;
+    public Declaration currentStruct;
+//    public FunctionDeclaration currentFunction;
+    public Declaration currentFunction;
     private boolean isInFor = false;
 
     public TypeChecker(){
@@ -57,8 +67,11 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(MainDeclaration mainDec) {
-        this.expressionTypeChecker.setCurrentFunction(null);
-        this.currentFunction = null;
+        this.expressionTypeChecker.setCurrentFunction(mainDec);
+        this.currentFunction = mainDec;
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        SymbolTable.push(new SymbolTable());
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         mainDec.getBody().accept(this);
         return null;
     }
@@ -66,6 +79,18 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(VariableDeclaration variableDec) {
         this.expressionTypeChecker.checkTypeValidation(variableDec.getVarType(), variableDec);
+//FOR SYMBOL TABLE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        String name = variableDec.getVarName().getName();
+
+        VariableSymbolTableItem variableSymbolTableItem = new VariableSymbolTableItem(variableDec.getVarName());
+        try {
+            SymbolTable.top.getItem(variableSymbolTableItem.getKey());
+        } catch (ItemNotFoundException exception2) {
+            try {
+                SymbolTable.top.put(variableSymbolTableItem);
+            } catch (ItemAlreadyExistsException exception3) { //unreachable
+            }
+        }
         return null;
     }
 
@@ -141,7 +166,7 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(ReturnStmt returnStmt) {
         Type retType = returnStmt.getReturnedExpr().accept(expressionTypeChecker);
-        Type actualRetType = this.currentFunction.getReturnType();
+        Type actualRetType = ((FunctionDeclaration) this.currentFunction).getReturnType();
         if(!expressionTypeChecker.isFirstSubTypeOfSecond(retType, actualRetType)) {
             //CHECK : Error Input GetLine
             ReturnValueNotMatchFunctionReturnType exception = new ReturnValueNotMatchFunctionReturnType(returnStmt.getLine());
@@ -164,6 +189,9 @@ public class TypeChecker extends Visitor<Void> {
     public Void visit(VarDecStmt varDecStmt) {
         for (VariableDeclaration variableDeclaration : varDecStmt.getVars()) {
             variableDeclaration.accept(this);
+            if (variableDeclaration.getVarType() instanceof StructType) {
+                StructNotDeclared exception = new StructNotDeclared(varDecStmt.getLine(), variableDeclaration.getVarType().toString());
+            }
         }
         return null;
     }

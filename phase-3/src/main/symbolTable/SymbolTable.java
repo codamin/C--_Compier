@@ -7,11 +7,7 @@ import main.symbolTable.items.SymbolTableItem;
 import main.symbolTable.utils.Stack;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 
 
 public class SymbolTable {
@@ -53,6 +49,10 @@ public class SymbolTable {
     }
 
     public SymbolTableItem getItem(String key) throws ItemNotFoundException {
+//        System.out.println("11111111111111111111111");
+//        System.out.println(this.items);
+//        System.out.println("22222222222222222222222");
+
         Set<SymbolTable> visitedSymbolTables = new HashSet<>();
         SymbolTable currentSymbolTable = this;
         while((currentSymbolTable != null) && (!visitedSymbolTables.contains(currentSymbolTable))) {
@@ -62,7 +62,7 @@ public class SymbolTable {
                 return symbolTableItem;
             currentSymbolTable = currentSymbolTable.pre;
         }
+
         throw new ItemNotFoundException();
     }
-
 }

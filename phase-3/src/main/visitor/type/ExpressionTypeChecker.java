@@ -1,7 +1,9 @@
 package main.visitor.type;
 
 import main.ast.nodes.Node;
+import main.ast.nodes.declaration.Declaration;
 import main.ast.nodes.declaration.FunctionDeclaration;
+import main.ast.nodes.declaration.MainDeclaration;
 import main.ast.nodes.declaration.struct.StructDeclaration;
 import main.ast.nodes.expression.*;
 import main.ast.nodes.expression.operators.BinaryOperator;
@@ -17,15 +19,18 @@ import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.FunctionSymbolTableItem;
 import main.symbolTable.items.StructSymbolTableItem;
+import main.symbolTable.items.SymbolTableItem;
 import main.symbolTable.items.VariableSymbolTableItem;
 import main.visitor.Visitor;
 
 import javax.lang.model.type.NullType;
+import java.awt.geom.NoninvertibleTransformException;
 import java.util.ArrayList;
 
 public class ExpressionTypeChecker extends Visitor<Type> {
     private StructDeclaration currentStruct;
-    private FunctionDeclaration currentFunction;
+//    private FunctionDeclaration currentFunction;
+    private Declaration currentFunction;
     private int typeValidationNumberOfErrors;
     private boolean seenNoneLvalue = false;
     private boolean isInMethodCallStmt = false;
@@ -34,9 +39,13 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         this.currentStruct = currentStruct;
     }
 
-    public void setCurrentFunction(FunctionDeclaration currentFunction) {
+    public void setCurrentFunction(Declaration currentFunction) {
         this.currentFunction = currentFunction;
     }
+//    public void setCurrentFunction(FunctionDeclaration currentFunction) {
+//        this.currentFunction = currentFunction;
+//    }
+
 
     public void setIsInMethodCallStmt(boolean inIsMethodCallStmt) {
         isInMethodCallStmt = inIsMethodCallStmt;
@@ -322,20 +331,19 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(Identifier identifier) {
+        System.out.println(identifier.toString());
+//        try {
+//            FunctionSymbolTableItem functionSymbolTableItem =
+//                    (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
+//            return new FptrType(functionSymbolTableItem.getArgTypes(), functionSymbolTableItem.getReturnType());
+//        } catch (ItemNotFoundException e) {
+//            VarNotDeclared exception = new VarNotDeclared(identifier.getLine(), identifier.getName());
+//            identifier.addError(exception);
+//            return new NoType();
+//        }
         try {
-            System.out.println("one");
-            StructSymbolTableItem structSymbolTableItem = (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + this.currentStruct.getStructName().getName());
-            System.out.println("tne");
-            SymbolTable structSymbolTable = structSymbolTableItem.getStructSymbolTable();
-            System.out.println("the");
-            System.out.println(this.currentFunction.getFunctionName().getName());
-            FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) structSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + this.currentFunction.getFunctionName().getName());
-            System.out.println("ore");
-            SymbolTable methodSymbolTable = methodSymbolTableItem.getFunctionSymbolTable();
-            System.out.println("free");
-            VariableSymbolTableItem localVariableSymbolTableItem = (VariableSymbolTableItem) methodSymbolTable.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
-            System.out.println("osxne");
-            return this.refineType(localVariableSymbolTableItem.getType());
+            SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
+            return new NoType();
         } catch (ItemNotFoundException e) {
             VarNotDeclared exception = new VarNotDeclared(identifier.getLine(), identifier.getName());
             identifier.addError(exception);

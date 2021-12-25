@@ -100,7 +100,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     public Type refineType(Type type) {
         typeValidationNumberOfErrors = 0;
-//        this.checkTypeValidation(type, new NullValue());
+//        this.checkTypeValidation(type, );
         if(typeValidationNumberOfErrors > 0)
             return new NoType();
         return type;
@@ -124,13 +124,14 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 //            }
 //        }
         // Check Here!!!
-        if(type instanceof FptrType) {
-            Type retType = ((FptrType) type).getReturnType();
-            ArrayList<Type> argsType = ((FptrType) type).getArgsType();
-            this.checkTypeValidation(retType, node);
-            for(Type argType : argsType)
-                this.checkTypeValidation(argType, node);
-        }
+//        if(type instanceof FptrType) {
+//            System.out.println("FPRT RETURN TYPE VALUE***********************************************");
+//            Type retType = ((FptrType) type).getReturnType();
+//            ArrayList<Type> argsType = ((FptrType) type).getArgsType();
+//            this.checkTypeValidation(retType, node);
+//            for(Type argType : argsType)
+//                this.checkTypeValidation(argType, node);
+//        }
     }
 
     public boolean areAllSameType(ArrayList<Type> types) {
@@ -292,13 +293,17 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     public Type visit(FunctionCall funcCall) {
         this.seenNoneLvalue = true;
         Type instanceType = funcCall.getInstance().accept(this);
+
         boolean prevIsInMethodCallStmt = this.isInMethodCallStmt;
         this.setIsInMethodCallStmt(false);
+
         ArrayList<Type> argsTypes = new ArrayList<>();
         for(Expression arg : funcCall.getArgs()) {
             argsTypes.add(arg.accept(this));
         }
+
         this.setIsInMethodCallStmt(prevIsInMethodCallStmt);
+
         if(!(instanceType instanceof FptrType || instanceType instanceof NoType)) {
             CallOnNoneFptrType exception = new CallOnNoneFptrType(funcCall.getLine());
             funcCall.addError(exception);
@@ -311,7 +316,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             ArrayList<Type> actualArgsTypes = ((FptrType) instanceType).getArgsType();
             Type returnType = ((FptrType) instanceType).getReturnType();
             boolean hasError = false;
-            if(!isInMethodCallStmt && (returnType instanceof NullType)) {
+            if(!isInMethodCallStmt && (returnType instanceof VoidType)) {
                 CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
                 funcCall.addError(exception);
                 hasError = true;
@@ -327,6 +332,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 return new NoType();
             }
         }
+
     }
 
     @Override
@@ -342,12 +348,23 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 //            return new NoType();
 //        }
         try {
-            SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
-            return new NoType();
-        } catch (ItemNotFoundException e) {
-            VarNotDeclared exception = new VarNotDeclared(identifier.getLine(), identifier.getName());
-            identifier.addError(exception);
-            return new NoType();
+            VariableSymbolTableItem symbolTableItem =
+                    (VariableSymbolTableItem) SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
+//            System.out.println("checking in identifier ");
+//            System.out.println(VariableSymbolTableItem.START_KEY + identifier.getName());
+//            System.out.println(symbolTableItem.getType());
+            return symbolTableItem.getType();
+        } catch (ItemNotFoundException e1) {
+            try {
+                FunctionSymbolTableItem functionSymbolTableItem =
+                        (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
+                return new FptrType(functionSymbolTableItem.getArgTypes(), functionSymbolTableItem.getReturnType());
+
+            } catch (ItemNotFoundException e2) {
+                VarNotDeclared exception = new VarNotDeclared(identifier.getLine(), identifier.getName());
+                identifier.addError(exception);
+                return new NoType();
+            }
         }
     }
 
@@ -394,26 +411,30 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             return new NoType();
         else if(instanceType instanceof StructType) {
             String structName = ((StructType) instanceType).getStructName().getName();
+
             SymbolTable classSymbolTable;
             try {
                 classSymbolTable = ((StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + structName)).getStructSymbolTable();
             } catch (ItemNotFoundException classNotFound) {
+
                 return new NoType();
             }
             try {
                 VariableSymbolTableItem fieldSymbolTableItem = (VariableSymbolTableItem) classSymbolTable.getItem(VariableSymbolTableItem.START_KEY + memberName);
-                return this.refineType(fieldSymbolTableItem.getType());
+                return fieldSymbolTableItem.getType();
             } catch (ItemNotFoundException memberNotField) {
                 try {
                     FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) classSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + memberName);
                     this.seenNoneLvalue = true;
-                    return new FptrType(methodSymbolTableItem.getArgTypes(), methodSymbolTableItem.getReturnType());
+//                    return new FptrType(methodSymbolTableItem.getArgTypes(), methodSymbolTableItem.getReturnType());
+                    return methodSymbolTableItem.getReturnType();
+
                 } catch (ItemNotFoundException memberNotFound) {
-                    if(memberName.equals(structName)) {
-                        this.seenNoneLvalue = true;
-                        return new FptrType(new ArrayList<>(), new VoidType());
-                    }
-                    StructMemberNotFound exception = new StructMemberNotFound(structAccess.getLine(), memberName, structName);
+//                    if(memberName.equals(structName)) {
+//                        this.seenNoneLvalue = true;
+//                        return new FptrType(new ArrayList<>(), new VoidType());
+//                    }
+                    StructMemberNotFound exception = new StructMemberNotFound(structAccess.getLine(), structName, memberName);
                     structAccess.addError(exception);
                     return new NoType();
                 }
@@ -443,6 +464,14 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(ListAppend listAppend) {
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        // WE WILL CHANGE THIS ---> GIVEN TO JAHANI
         System.out.println("listAppend");
         // Do we need to check the availability of listName? and does listArg cast to its type for accept(this) ?
         Type lat = listAppend.getListArg().accept(this);

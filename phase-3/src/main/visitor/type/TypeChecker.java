@@ -22,10 +22,7 @@ import main.symbolTable.items.VariableSymbolTableItem;
 import main.visitor.Visitor;
 
 public class TypeChecker extends Visitor<Void> {
-//    private final Graph<String> strucyHierarchy;
     public ExpressionTypeChecker expressionTypeChecker;
-//    public StructDeclaration currentStruct;
-//    public Declaration currentStruct;
     public FunctionDeclaration currentFunction;
     private boolean isInFor = false;
     private boolean isInSet = false;
@@ -122,8 +119,6 @@ public class TypeChecker extends Visitor<Void> {
 //FOR SYMBOL TABLE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         VariableSymbolTableItem variableSymbolTableItem = new VariableSymbolTableItem(variableDec.getVarName());
         variableSymbolTableItem.setType(finalType);
-        System.out.println(variableSymbolTableItem.getType());
-
         try {
             VariableSymbolTableItem vsti = (VariableSymbolTableItem) SymbolTable.top.getItem(variableSymbolTableItem.getKey());
             vsti.setType(finalType);
@@ -135,7 +130,6 @@ public class TypeChecker extends Visitor<Void> {
         }
         try {
             VariableSymbolTableItem vsti = (VariableSymbolTableItem) SymbolTable.top.getItem(variableSymbolTableItem.getKey());
-            System.out.println(variableDec.getLine() + vsti.getName().toString() + ">>>type in symbolTable " + vsti.getType().toString());
         } catch (ItemNotFoundException e3) {}
         return null;
     }
@@ -255,7 +249,6 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(ReturnStmt returnStmt) {
         this.hasReturn = true;
-        System.out.println(returnStmt.getLine());
         Type retType = returnStmt.getReturnedExpr().accept(expressionTypeChecker);
         if(isInSet || isInMain) {
             CannotUseReturn exception = new CannotUseReturn(returnStmt.getLine());

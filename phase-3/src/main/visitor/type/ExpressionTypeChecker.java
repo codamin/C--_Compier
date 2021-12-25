@@ -244,8 +244,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 return new NoType();
             else if((firstType instanceof NoType && !(secondType instanceof BoolType)) ||
                     (secondType instanceof NoType && !(firstType instanceof BoolType))) {
-                System.out.println("line :&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&7" + binaryExpression.getLine() + operator.name());
-                System.out.println(firstType.toString() + "<><<" + secondType.toString());
                 UnsupportedOperandType exception = new UnsupportedOperandType(binaryExpression.getLine(), operator.name());
                 binaryExpression.addError(exception);
                 return new NoType();
@@ -307,8 +305,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(FunctionCall funcCall) {
-        System.out.println("<<<<<<<<<<<<<<<<<<<<,function Name" + funcCall.getInstance().getLine());
-        System.out.println(isInMethodCallStmt);
         this.seenNoneLvalue = true;
         Type instanceType = funcCall.getInstance().accept(this);
 
@@ -355,19 +351,14 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(Identifier identifier) {
-        System.out.println(identifier.toString());
         try {
             VariableSymbolTableItem symbolTableItem =
                     (VariableSymbolTableItem) SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
-            System.out.println("checking in identifier ");
-//            System.out.println(VariableSymbolTableItem.START_KEY + identifier.getName());
-//            System.out.println(symbolTableItem.getType());
             return symbolTableItem.getType();
         } catch (ItemNotFoundException e1) {
             try {
                 FunctionSymbolTableItem functionSymbolTableItem =
                         (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
-                System.out.println("checking in identifier2222 ");
                 return new FptrType(functionSymbolTableItem.getArgTypes(), functionSymbolTableItem.getReturnType());
 
             } catch (ItemNotFoundException e2) {
@@ -415,12 +406,10 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(StructAccess structAccess) {
-        System.out.println("Struct Acceassss " + structAccess.getInstance().toString() + structAccess.getElement().toString());
         boolean prevSeenNoneLvalue = this.seenNoneLvalue;
         Type instanceType = structAccess.getInstance().accept(this);
 //        if(structAccess.getInstance() instanceof ThisClass)
 //            this.seenNoneLvalue = prevSeenNoneLvalue;
-        System.out.println(instanceType.toString());
         String memberName = structAccess.getElement().getName();
         if(instanceType instanceof NoType)
             return new NoType();
@@ -434,7 +423,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             }
             try {
                 VariableSymbolTableItem fieldSymbolTableItem = (VariableSymbolTableItem) classSymbolTable.getItem(VariableSymbolTableItem.START_KEY + memberName);
-                System.out.println("###########" + fieldSymbolTableItem.getType());
                 return fieldSymbolTableItem.getType();
             } catch (ItemNotFoundException memberNotField) {
                 try {
@@ -463,7 +451,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(ListSize listSize) {
-        System.out.println("listSize");
         Type at = listSize.getArg().accept(this);
         if(at instanceof NoType) {
             return new NoType();
@@ -478,12 +465,10 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(ListAppend listAppend) {
-        System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD " + listAppend.getLine());
         if(!isInMethodCallStmt) {
             CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(listAppend.getLine());
             listAppend.addError(exception);
         }
-        System.out.println("listAppend");
         // Do we need to check the availability of listName? and does listArg cast to its type for accept(this) ?
         Type lat = listAppend.getListArg().accept(this);
         Type eat = listAppend.getElementArg().accept(this);

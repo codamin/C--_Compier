@@ -25,6 +25,8 @@ import main.symbolTable.items.VariableSymbolTableItem;
 import main.symbolTable.utils.graph.Graph;
 import main.visitor.Visitor;
 
+import java.sql.SQLOutput;
+
 public class TypeChecker extends Visitor<Void> {
 //    private final Graph<String> strucyHierarchy;
     public ExpressionTypeChecker expressionTypeChecker;
@@ -74,6 +76,7 @@ public class TypeChecker extends Visitor<Void> {
             varDeclaration.accept(this);
         }
         functionDec.getBody().accept(this);
+        SymbolTable.pop();
         return null;
     }
 
@@ -133,12 +136,27 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(StructDeclaration structDec) {
+        try {
+            StructSymbolTableItem structSymbolTableItem =
+                    (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + structDec.getStructName().getName());
+            SymbolTable.push(structSymbolTableItem.getStructSymbolTable());
+        } catch (ItemNotFoundException e) {
+            e.printStackTrace();
+        }
         structDec.getBody().accept(this);
         return null;
     }
 
     @Override
     public Void visit(SetGetVarDeclaration setGetVarDec) {
+        try {
+            FunctionSymbolTableItem functionSymbolTableItem =
+                    (FunctionSymbolTableItem) SymbolTable.top.getItem(FunctionSymbolTableItem.START_KEY + setGetVarDec.getVarName().getName());
+            SymbolTable.push(functionSymbolTableItem.getFunctionSymbolTable());
+        } catch (ItemNotFoundException e) {
+//            e.printStackTrace();
+            return null;
+        }
         isInSet = true;
         setGetVarDec.getSetterBody().accept(this);
         isInSet = false;
@@ -149,6 +167,7 @@ public class TypeChecker extends Visitor<Void> {
         for(VariableDeclaration variableDeclaration : setGetVarDec.getArgs()) {
             variableDeclaration.accept(this);
         }
+        SymbolTable.pop();
         return null;
     }
 

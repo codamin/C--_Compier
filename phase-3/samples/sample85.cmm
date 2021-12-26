@@ -95,4 +95,12 @@ main() begin
     b.ss = 4;
     s.a = 5;
 
+    int k;
+    bool bo = true;
+    int yek = 1;
+    bool dow;
+    display(yek == dow);
+
+    int a1, b1;
+    a1 = b1 = 2;
 end

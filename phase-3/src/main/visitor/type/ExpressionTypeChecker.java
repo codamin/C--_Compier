@@ -95,18 +95,18 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     }
 
     public Type getReturnType(Type type) {
-        if(validateTypeOnNode(type, new IntValue(0)) > 0)
+        if(validateNodeType(type, new IntValue(0)) > 0)
             return new NoType();
         return type;
     }
 
-    public int validateTypeOnNode(Type type, Node node) {
+    public int validateNodeType(Type type, Node node) {
         int numErrors = 0;
         if(!(type instanceof StructType || type instanceof FptrType || type instanceof ListType))
             return numErrors;
         if(type instanceof ListType) {
             Type elementType = ((ListType) type).getType();
-            numErrors += validateTypeOnNode(elementType, node);
+            numErrors += validateNodeType(elementType, node);
         }
         if(type instanceof StructType) {
             String structName = ((StructType)type).getStructName().getName();
@@ -119,25 +119,32 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             }
         }
         if(type instanceof FptrType) {
-            Type retType = ((FptrType) type).getReturnType();
-            ArrayList<Type> argsType = ((FptrType) type).getArgsType();
-            numErrors += validateTypeOnNode(retType, node);
-            for(Type argType : argsType)
-                numErrors += validateTypeOnNode(argType, node);
+            numErrors += validateNodeType(((FptrType) type).getReturnType(), node);
+            for(Type argType : ((FptrType) type).getArgsType())
+                numErrors += validateNodeType(argType, node);
         }
         return numErrors;
     }
 
     public boolean isLvalue(Expression expression) {
-        boolean prevIsCatchErrorsActive = Node.isCatchErrorsActive;
         boolean prevSeenNoneLvalue = seenNoneLvalue;
-        Node.isCatchErrorsActive = false;
         seenNoneLvalue = false;
-        expression.accept(this);
-        boolean isLvalue = !seenNoneLvalue;
+        boolean notLvalue;
+
+        if (Node.isCatchErrorsActive) {
+            Node.isCatchErrorsActive = false;
+            expression.accept(this);
+            notLvalue = seenNoneLvalue;
+            Node.isCatchErrorsActive = true;
+        }
+        else {
+            Node.isCatchErrorsActive = false;
+            expression.accept(this);
+            notLvalue = seenNoneLvalue;
+            Node.isCatchErrorsActive = false;
+        }
         seenNoneLvalue = prevSeenNoneLvalue;
-        Node.isCatchErrorsActive = prevIsCatchErrorsActive;
-        return isLvalue;
+        return !notLvalue;
     }
 
     @Override

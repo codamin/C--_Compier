@@ -6,7 +6,6 @@ import main.ast.nodes.declaration.struct.*;
 import main.ast.nodes.expression.operators.BinaryOperator;
 import main.ast.nodes.statement.*;
 import main.ast.types.NoType;
-import main.ast.types.StructType;
 import main.ast.types.Type;
 import main.ast.types.primitives.BoolType;
 import main.ast.types.primitives.IntType;
@@ -59,7 +58,7 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionDeclaration functionDec) {
-        this.expressionTypeChecker.validateTypeOnNode(functionDec.getReturnType(), functionDec);
+        this.expressionTypeChecker.validateNodeType(functionDec.getReturnType(), functionDec);
         Type retType = functionDec.getReturnType();
         SymbolTable.push(new SymbolTable());
         for(VariableDeclaration varDeclaration : functionDec.getArgs()) {
@@ -100,7 +99,7 @@ public class TypeChecker extends Visitor<Void> {
             }
         }
 
-        int numErrors = this.expressionTypeChecker.validateTypeOnNode(variableDec.getVarType(), variableDec);
+        int numErrors = this.expressionTypeChecker.validateNodeType(variableDec.getVarType(), variableDec);
         Type finalType = variableDec.getVarType();
         if(numErrors > 0) {
             finalType = new NoType();

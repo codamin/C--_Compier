@@ -91,6 +91,7 @@ public class TypeChecker extends Visitor<Void> {
         isInMain = true;
         SymbolTable.push(new SymbolTable());
         mainDec.getBody().accept(this);
+        SymbolTable.pop();
         isInMain = false;
         return null;
     }
@@ -196,7 +197,7 @@ public class TypeChecker extends Visitor<Void> {
             LeftSideNotLvalue exception = new LeftSideNotLvalue(assignmentStmt.getLine());
             assignmentStmt.addError(exception);
         }
-        // CHECK
+
         boolean isSubtype = expressionTypeChecker.isFirstSubTypeOfSecond(secondType, firstType);
         if(firstType instanceof NoType) {
             return null;
@@ -244,7 +245,10 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(DisplayStmt displayStmt) {
+        boolean prevIsInMethodCallStmt = expressionTypeChecker.getIsInMethodCallStmt();
+        expressionTypeChecker.setIsInMethodCallStmt(false);
         Type type = displayStmt.getArg().accept(expressionTypeChecker);
+        expressionTypeChecker.setIsInMethodCallStmt(prevIsInMethodCallStmt);
         if(!(type instanceof IntType || type instanceof BoolType || type instanceof NoType)) {
             UnsupportedTypeForDisplay exception = new UnsupportedTypeForDisplay(displayStmt.getLine());
             displayStmt.addError(exception);
@@ -302,17 +306,19 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(ListAppendStmt listAppendStmt) {
+        boolean prevIsInMethodCallStmt = expressionTypeChecker.getIsInMethodCallStmt();
         expressionTypeChecker.setIsInMethodCallStmt(true);
-        Type type = listAppendStmt.getListAppendExpr().accept(expressionTypeChecker);
-        expressionTypeChecker.setIsInMethodCallStmt(false);
+        listAppendStmt.getListAppendExpr().accept(expressionTypeChecker);
+        expressionTypeChecker.setIsInMethodCallStmt(prevIsInMethodCallStmt);
         return null;
     }
 
     @Override
     public Void visit(ListSizeStmt listSizeStmt) {
-//        expressionTypeChecker.setIsInMethodCallStmt(true);
+        boolean prevIsInMethodCallStmt = expressionTypeChecker.getIsInMethodCallStmt();
+        expressionTypeChecker.setIsInMethodCallStmt(true);
         listSizeStmt.getListSizeExpr().accept(expressionTypeChecker);
-//        expressionTypeChecker.setIsInMethodCallStmt(false);
+        expressionTypeChecker.setIsInMethodCallStmt(prevIsInMethodCallStmt);
         return null;
     }
 }

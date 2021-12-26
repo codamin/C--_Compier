@@ -20,36 +20,29 @@ import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.FunctionSymbolTableItem;
 import main.symbolTable.items.StructSymbolTableItem;
-import main.symbolTable.items.SymbolTableItem;
 import main.symbolTable.items.VariableSymbolTableItem;
 import main.visitor.Visitor;
 
 import javax.lang.model.type.NullType;
-import java.awt.geom.NoninvertibleTransformException;
 import java.util.ArrayList;
 
 public class ExpressionTypeChecker extends Visitor<Type> {
     private StructDeclaration currentStruct;
-//    private FunctionDeclaration currentFunction;
     private Declaration currentFunction;
     private int typeValidationNumberOfErrors;
     private boolean seenNoneLvalue = false;
     private boolean isInMethodCallStmt = false;
 
-    public void setCurrentStruct(StructDeclaration currentStruct) {
-        this.currentStruct = currentStruct;
-    }
-
     public void setCurrentFunction(Declaration currentFunction) {
         this.currentFunction = currentFunction;
     }
-//    public void setCurrentFunction(FunctionDeclaration currentFunction) {
-//        this.currentFunction = currentFunction;
-//    }
-
 
     public void setIsInMethodCallStmt(boolean inIsMethodCallStmt) {
         isInMethodCallStmt = inIsMethodCallStmt;
+    }
+
+    boolean getIsInMethodCallStmt() {
+        return this.isInMethodCallStmt;
     }
 
     public boolean isFirstSubTypeOfSecondMultiple(ArrayList<Type> first, ArrayList<Type> second) {
@@ -82,8 +75,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             Type secondRetType = ((FptrType) second).getReturnType();
             if(!firstRetType.toString().equals(secondRetType.toString()))
                 return false;
-//            if(!isFirstSubTypeOfSecond(firstRetType, secondRetType))
-//                return false;
             ArrayList<Type> firstArgsTypes = ((FptrType) first).getArgsType();
             ArrayList<Type> secondArgsTypes = ((FptrType) second).getArgsType();
             if(firstArgsTypes.size() != secondArgsTypes.size())
@@ -101,7 +92,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             Type secondType = ((ListType)second).getType();
 
             if(firstType.toString().equals(secondType.toString()))
-//            if (isFirstSubTypeOfSecond(firstElements, secondElements))
                 return true;
         }
         return false;
@@ -141,20 +131,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 ans += this.checkTypeValidation(argType, node);
         }
         return ans;
-    }
-
-    public boolean areAllSameType(ArrayList<Type> types) {
-        if(types.size() == 0)
-            return true;
-        Type firstType = types.get(0);
-        for(Type type : types)
-            if(!isSameType(firstType, type))
-                return false;
-        return true;
-    }
-
-    public boolean isSameType(Type t1, Type t2) {
-        return (t1 instanceof NoType) || (t2 instanceof NoType) || (isFirstSubTypeOfSecond(t1, t2) && isFirstSubTypeOfSecond(t2, t1));
     }
 
     public boolean isLvalue(Expression expression) {
@@ -308,12 +284,10 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
         boolean prevIsInMethodCallStmt = this.isInMethodCallStmt;
         this.setIsInMethodCallStmt(false);
-
         ArrayList<Type> argsTypes = new ArrayList<>();
         for(Expression arg : funcCall.getArgs()) {
             argsTypes.add(arg.accept(this));
         }
-
         this.setIsInMethodCallStmt(prevIsInMethodCallStmt);
 
         if(!(instanceType instanceof FptrType || instanceType instanceof NoType)) {
@@ -327,15 +301,11 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         else {
             ArrayList<Type> actualArgsTypes = ((FptrType) instanceType).getArgsType();
             Type returnType = ((FptrType) instanceType).getReturnType();
-            boolean hasError = false;
             if(!isInMethodCallStmt && (returnType instanceof VoidType)) {
                 CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
                 funcCall.addError(exception);
-                hasError = true;
             }
             if(this.isFirstSubTypeOfSecondMultiple(argsTypes, actualArgsTypes)) {
-                if(hasError)
-                    return new NoType();
                 return this.refineType(returnType);
             }
             else {
@@ -397,10 +367,8 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(StructAccess structAccess) {
-        boolean prevSeenNoneLvalue = this.seenNoneLvalue;
+//        this.seenNoneLvalue = true; // This actually is for structAccess Lvalue error
         Type instanceType = structAccess.getInstance().accept(this);
-//        if(structAccess.getInstance() instanceof ThisClass)
-//            this.seenNoneLvalue = prevSeenNoneLvalue;
         String memberName = structAccess.getElement().getName();
         if(instanceType instanceof NoType)
             return new NoType();
@@ -419,14 +387,9 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 try {
                     FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) classSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + memberName);
                     this.seenNoneLvalue = true;
-//                    return new FptrType(methodSymbolTableItem.getArgTypes(), methodSymbolTableItem.getReturnType());
                     return methodSymbolTableItem.getReturnType();
 
                 } catch (ItemNotFoundException memberNotFound) {
-//                    if(memberName.equals(structName)) {
-//                        this.seenNoneLvalue = true;
-//                        return new FptrType(new ArrayList<>(), new VoidType());
-//                    }
                     StructMemberNotFound exception = new StructMemberNotFound(structAccess.getLine(), structName, memberName);
                     structAccess.addError(exception);
                     return new NoType();
@@ -460,8 +423,14 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(listAppend.getLine());
             listAppend.addError(exception);
         }
+
+        boolean prevIsInMethodCallStmt = this.isInMethodCallStmt;
+        this.isInMethodCallStmt = false;
         Type lat = listAppend.getListArg().accept(this);
+        this.isInMethodCallStmt = false;
         Type eat = listAppend.getElementArg().accept(this);
+        isInMethodCallStmt = prevIsInMethodCallStmt;
+
         if(lat instanceof NoType || eat instanceof NoType) {
             return new NoType();
         }

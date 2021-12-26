@@ -101,7 +101,7 @@ public class TypeChecker extends Visitor<Void> {
 
         if(variableDec.getDefaultValue() != null) {
             Type defaultValType = variableDec.getDefaultValue().accept(expressionTypeChecker);
-            boolean isSubtype = expressionTypeChecker.isFirstSubTypeOfSecond(defaultValType, variableDec.getVarType());
+            boolean isSubtype = expressionTypeChecker.doTypesMatch(defaultValType, variableDec.getVarType());
             if(!isSubtype) {
                 UnsupportedOperandType exception = new UnsupportedOperandType(variableDec.getLine(), BinaryOperator.assign.name());
                 variableDec.addError(exception);
@@ -194,7 +194,7 @@ public class TypeChecker extends Visitor<Void> {
             assignmentStmt.addError(exception);
         }
 
-        boolean isSubtype = expressionTypeChecker.isFirstSubTypeOfSecond(secondType, firstType);
+        boolean isSubtype = expressionTypeChecker.doTypesMatch(secondType, firstType);
         if(firstType instanceof NoType) {
             return null;
         }
@@ -272,7 +272,7 @@ public class TypeChecker extends Visitor<Void> {
             actualRetType = this.currentFunction.getReturnType();
         }
 
-        if(!expressionTypeChecker.isFirstSubTypeOfSecond(retType, actualRetType)) {
+        if(!expressionTypeChecker.doTypesMatch(retType, actualRetType)) {
             ReturnValueNotMatchFunctionReturnType exception = new ReturnValueNotMatchFunctionReturnType(returnStmt.getLine());
             returnStmt.addError(exception);
         }

@@ -42,17 +42,18 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         return this.isInFunctionCallStmt;
     }
 
-    public boolean isFirstSubTypeOfSecondMultiple(ArrayList<Type> first, ArrayList<Type> second) {
-        if(first.size() != second.size())
-            return false;
-        for(int i = 0; i < first.size(); i++) {
-            if(!isFirstSubTypeOfSecond(first.get(i), second.get(i)))
-                return false;
+    public boolean doArraysTypesMatch(ArrayList<Type> first, ArrayList<Type> second) {
+        if(first.size() == second.size()) {
+            for (int i = 0; i < first.size(); i++) {
+                if (!doTypesMatch(first.get(i), second.get(i)))
+                    return false;
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
-    public boolean isFirstSubTypeOfSecond(Type first, Type second) {
+    public boolean doTypesMatch(Type first, Type second) {
         if(first instanceof NoType)
             return true;
         else if(first instanceof IntType || first instanceof BoolType || first instanceof VoidType) {
@@ -233,7 +234,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             if(firstType instanceof NoType || secondType instanceof NoType) {
                 return new NoType();
             }
-            boolean isSubtype = this.isFirstSubTypeOfSecond(secondType, firstType);
+            boolean isSubtype = this.doTypesMatch(secondType, firstType);
             if(isSubtype) {
                 if(isFirstLvalue)
                     return secondType;
@@ -302,7 +303,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
                 funcCall.addError(exception);
             }
-            if(this.isFirstSubTypeOfSecondMultiple(argsTypes, actualArgsTypes)) {
+            if(this.doArraysTypesMatch(argsTypes, actualArgsTypes)) {
                 return this.refineType(returnType);
             }
             else {
@@ -436,7 +437,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             listAppend.addError(exception);
             return new NoType();
         }
-        if(!isFirstSubTypeOfSecond(eat, ((ListType)lat).getType())) {
+        if(!doTypesMatch(eat, ((ListType)lat).getType())) {
             NewElementTypeNotMatchListType exception = new NewElementTypeNotMatchListType(listAppend.getLine());
             listAppend.addError(exception);
             return new NoType();

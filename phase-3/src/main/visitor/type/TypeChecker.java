@@ -59,16 +59,8 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionDeclaration functionDec) {
-//        this.expressionTypeChecker.checkTypeValidation(functionDec.getReturnType(), functionDec);
+        this.expressionTypeChecker.validateTypeOnNode(functionDec.getReturnType(), functionDec);
         Type retType = functionDec.getReturnType();
-        if(retType instanceof StructType) {
-            try {
-                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + ((StructType) retType).getStructName().getName());
-            } catch (ItemNotFoundException e) {
-                StructNotDeclared exception = new StructNotDeclared(functionDec.getLine(), ((StructType) retType).getStructName().getName());
-                functionDec.addError(exception);
-            }
-        }
         SymbolTable.push(new SymbolTable());
         for(VariableDeclaration varDeclaration : functionDec.getArgs()) {
             varDeclaration.accept(this);
@@ -108,7 +100,7 @@ public class TypeChecker extends Visitor<Void> {
             }
         }
 
-        int numErrors = this.expressionTypeChecker.checkTypeValidation(variableDec.getVarType(), variableDec);
+        int numErrors = this.expressionTypeChecker.validateTypeOnNode(variableDec.getVarType(), variableDec);
         Type finalType = variableDec.getVarType();
         if(numErrors > 0) {
             finalType = new NoType();
@@ -137,9 +129,7 @@ public class TypeChecker extends Visitor<Void> {
             StructSymbolTableItem structSymbolTableItem =
                     (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + structDec.getStructName().getName());
             SymbolTable.push(structSymbolTableItem.getStructSymbolTable());
-        } catch (ItemNotFoundException e) {
-            e.printStackTrace();
-        }
+        } catch (ItemNotFoundException e) {}
         structDec.getBody().accept(this);
         SymbolTable.pop();
         return null;
@@ -152,9 +142,7 @@ public class TypeChecker extends Visitor<Void> {
             VariableSymbolTableItem variableSymbolTableItem =
                     (VariableSymbolTableItem) SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + setGetVarDec.getVarName().getName());
             variableSymbolTableItem.setType(setGetVarDec.getVarDec().getVarType());
-        } catch (ItemNotFoundException e) {
-            e.printStackTrace();
-        }
+        } catch (ItemNotFoundException e) {}
         try {
             FunctionSymbolTableItem functionSymbolTableItem =
                     (FunctionSymbolTableItem) SymbolTable.top.getItem(FunctionSymbolTableItem.START_KEY + setGetVarDec.getVarName().getName());

@@ -26,7 +26,6 @@ import java.util.ArrayList;
 public class ExpressionTypeChecker extends Visitor<Type> {
     private StructDeclaration currentStruct;
     private Declaration currentFunction;
-    private int typeValidationNumberOfErrors;
     private boolean seenNoneLvalue = false;
     private boolean isInFunctionCallStmt = false;
 
@@ -95,21 +94,19 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         return false;
     }
 
-    public Type refineType(Type type) {
-        typeValidationNumberOfErrors = 0;
-        this.checkTypeValidation(type, new IntValue(0));
-        if(typeValidationNumberOfErrors > 0)
+    public Type getReturnType(Type type) {
+        if(this.validateTypeOnNode(type, new IntValue(0)) > 0)
             return new NoType();
         return type;
     }
 
-    public int checkTypeValidation(Type type, Node node) {
+    public int validateTypeOnNode(Type type, Node node) {
         int ans = 0;
         if(!(type instanceof StructType || type instanceof FptrType || type instanceof ListType))
             return ans;
         if(type instanceof ListType) {
             Type elementType = ((ListType) type).getType();
-            ans += this.checkTypeValidation(elementType, node);
+            ans += this.validateTypeOnNode(elementType, node);
         }
         if(type instanceof StructType) {
             String structName = ((StructType)type).getStructName().getName();
@@ -124,9 +121,9 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         if(type instanceof FptrType) {
             Type retType = ((FptrType) type).getReturnType();
             ArrayList<Type> argsType = ((FptrType) type).getArgsType();
-            ans += this.checkTypeValidation(retType, node);
+            ans += this.validateTypeOnNode(retType, node);
             for(Type argType : argsType)
-                ans += this.checkTypeValidation(argType, node);
+                ans += this.validateTypeOnNode(argType, node);
         }
         return ans;
     }
@@ -304,7 +301,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 funcCall.addError(exception);
             }
             if(this.doArraysTypesMatch(argsTypes, actualArgsTypes)) {
-                return this.refineType(returnType);
+                return this.getReturnType(returnType);
             }
             else {
                 ArgsInFunctionCallNotMatchDefinition exception = new ArgsInFunctionCallNotMatchDefinition(funcCall.getLine());

@@ -68,8 +68,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         else if(first instanceof IntType || first instanceof BoolType || first instanceof VoidType) {
             return first.toString().equals(second.toString());
         }
-//        else if(first instanceof NullType)
-//            return second instanceof NullType || second instanceof FptrType || second instanceof StructType;
         else if(first instanceof StructType) {
             if(!(second instanceof StructType))
                 return false;
@@ -385,13 +383,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             Type lt = ((ListType) instanceType).getType();
             if(indexErrored)
                 return new NoType();
-//            if((listAccessByIndex.getIndex() instanceof IntValue) && (((IntValue)listAccessByIndex.getIndex()).getConstant() < ((ListType)instanceType).getElementsTypes().size())) {
-//                int index = ((IntValue)listAccessByIndex.getIndex()).getConstant();
-//                return this.refineType(((ListType) instanceType).getElementsTypes().get(index).getType());
-//            }
-//            else {
-//                return this.refineType(((ListType) instanceType).getElementsTypes().get(0).getType());
-//            }
         }
         else if(instanceType instanceof NoType) {
             return new NoType();
@@ -469,7 +460,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(listAppend.getLine());
             listAppend.addError(exception);
         }
-        // Do we need to check the availability of listName? and does listArg cast to its type for accept(this) ?
         Type lat = listAppend.getListArg().accept(this);
         Type eat = listAppend.getElementArg().accept(this);
         if(lat instanceof NoType || eat instanceof NoType) {
@@ -480,7 +470,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             listAppend.addError(exception);
             return new NoType();
         }
-        if(!isFirstSubTypeOfSecond(((ListType)lat).getType(), eat)) {
+        if(!isFirstSubTypeOfSecond(eat, ((ListType)lat).getType())) {
             NewElementTypeNotMatchListType exception = new NewElementTypeNotMatchListType(listAppend.getLine());
             listAppend.addError(exception);
             return new NoType();

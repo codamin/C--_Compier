@@ -1,5 +1,33 @@
+struct A begin
+    bool find (int arg) begin
+        set begin
+            int a; /* Err 19 */
+            return arg /* Err 18 */
+            return; /* Err 18 */
+        end
+        get begin
+            bool b = false; /* Err 19 */
+            /* return arg */
+        end
+    end
+end
+
+int function(int arg1, bool arg2) begin 
+    int a = 0; /* Err 20 */
+end
+
 main() begin
-list # list #list #list #struct A a;
-int b = true & false;
-list #list #fptr<list #struct a -> int> fprt1;
+/*    list # list #list #list #struct A a;
+    int b = true & false;
+    list #list #fptr<list #struct a -> int> fprt1; */
+
+    int a2 = 2;
+    bool c2 = false;
+    list #int b2;
+    int c = a2[c2]; /*Err 13&14*/
+    a2 = size(a2); /* Err 15 */
+    append(c2, a2); /* Err 16 */
+    append(b2, c2); /* Err 17 */
+    return /* Err 18 */
+    
 end

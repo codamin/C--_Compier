@@ -163,7 +163,6 @@ public class TypeChecker extends Visitor<Void> {
                     (FunctionSymbolTableItem) SymbolTable.top.getItem(FunctionSymbolTableItem.START_KEY + setGetVarDec.getVarName().getName());
             SymbolTable.push(functionSymbolTableItem.getFunctionSymbolTable());
         } catch (ItemNotFoundException e) {
-//            e.printStackTrace();
             return null;
         }
         for(VariableDeclaration variableDeclaration : setGetVarDec.getArgs()) {
@@ -175,7 +174,14 @@ public class TypeChecker extends Visitor<Void> {
         isInSet = false;
         SymbolTable.pop();
         isInGet = true;
+        boolean prevHasReturn = this.hasReturn;
+        this.hasReturn = false;
         setGetVarDec.getGetterBody().accept(this);
+        if(!hasReturn) {
+            MissingReturnStatement exception = new MissingReturnStatement(setGetVarDec.getGetterBody().getLine(), setGetVarDec.getVarName().getName());
+            setGetVarDec.addError(exception);
+        }
+        this.hasReturn = prevHasReturn;
         isInGet = false;
         return null;
     }
@@ -249,7 +255,13 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(ReturnStmt returnStmt) {
         this.hasReturn = true;
-        Type retType = returnStmt.getReturnedExpr().accept(expressionTypeChecker);
+        Type retType;
+        if(returnStmt.getReturnedExpr() != null) {
+            retType = returnStmt.getReturnedExpr().accept(expressionTypeChecker);
+        }
+        else {
+            retType = new VoidType();
+        }
         if(isInSet || isInMain) {
             CannotUseReturn exception = new CannotUseReturn(returnStmt.getLine());
             returnStmt.addError(exception);
@@ -260,11 +272,7 @@ public class TypeChecker extends Visitor<Void> {
             actualRetType = this.currentFunction.getReturnType();
         }
 
-        if(retType instanceof VoidType) {
-//            CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(returnStmt.getLine());
-//            returnStmt.addError(exception);
-        }
-        else if(!expressionTypeChecker.isFirstSubTypeOfSecond(retType, actualRetType)) {
+        if(!expressionTypeChecker.isFirstSubTypeOfSecond(retType, actualRetType)) {
             ReturnValueNotMatchFunctionReturnType exception = new ReturnValueNotMatchFunctionReturnType(returnStmt.getLine());
             returnStmt.addError(exception);
         }

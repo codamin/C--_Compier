@@ -124,7 +124,7 @@ public class TypeChecker extends Visitor<Void> {
     }
 
     @Override
-    public Void visit(StructDeclaration structDec) {
+    public Void visit(StructDeclaration structDec)  {
         try {
             StructSymbolTableItem structSymbolTableItem =
                     (StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + structDec.getStructName().getName());

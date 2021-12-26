@@ -30,7 +30,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     private boolean isInFunctionCallStmt = false;
 
     public void setCurrentFunction(Declaration currentFunction) {
-        this.currentFunction = currentFunction;
+        currentFunction = currentFunction;
     }
 
     public void setIsInFunctionCallStmt(boolean inIsFunctionCallStmt) {
@@ -38,7 +38,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     }
 
     boolean getIsInFunctionCallStmt() {
-        return this.isInFunctionCallStmt;
+        return isInFunctionCallStmt;
     }
 
     public boolean doArraysTypesMatch(ArrayList<Type> first, ArrayList<Type> second) {
@@ -95,18 +95,18 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     }
 
     public Type getReturnType(Type type) {
-        if(this.validateTypeOnNode(type, new IntValue(0)) > 0)
+        if(validateTypeOnNode(type, new IntValue(0)) > 0)
             return new NoType();
         return type;
     }
 
     public int validateTypeOnNode(Type type, Node node) {
-        int ans = 0;
+        int numErrors = 0;
         if(!(type instanceof StructType || type instanceof FptrType || type instanceof ListType))
-            return ans;
+            return numErrors;
         if(type instanceof ListType) {
             Type elementType = ((ListType) type).getType();
-            ans += this.validateTypeOnNode(elementType, node);
+            numErrors += validateTypeOnNode(elementType, node);
         }
         if(type instanceof StructType) {
             String structName = ((StructType)type).getStructName().getName();
@@ -115,34 +115,34 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             } catch (ItemNotFoundException e) {
                 StructNotDeclared exception = new StructNotDeclared(node.getLine(), structName);
                 node.addError(exception);
-                ans += 1;
+                numErrors += 1;
             }
         }
         if(type instanceof FptrType) {
             Type retType = ((FptrType) type).getReturnType();
             ArrayList<Type> argsType = ((FptrType) type).getArgsType();
-            ans += this.validateTypeOnNode(retType, node);
+            numErrors += validateTypeOnNode(retType, node);
             for(Type argType : argsType)
-                ans += this.validateTypeOnNode(argType, node);
+                numErrors += validateTypeOnNode(argType, node);
         }
-        return ans;
+        return numErrors;
     }
 
     public boolean isLvalue(Expression expression) {
         boolean prevIsCatchErrorsActive = Node.isCatchErrorsActive;
-        boolean prevSeenNoneLvalue = this.seenNoneLvalue;
+        boolean prevSeenNoneLvalue = seenNoneLvalue;
         Node.isCatchErrorsActive = false;
-        this.seenNoneLvalue = false;
+        seenNoneLvalue = false;
         expression.accept(this);
-        boolean isLvalue = !this.seenNoneLvalue;
-        this.seenNoneLvalue = prevSeenNoneLvalue;
+        boolean isLvalue = !seenNoneLvalue;
+        seenNoneLvalue = prevSeenNoneLvalue;
         Node.isCatchErrorsActive = prevIsCatchErrorsActive;
         return isLvalue;
     }
 
     @Override
     public Type visit(BinaryExpression binaryExpression) {
-        this.seenNoneLvalue = true;
+        seenNoneLvalue = true;
         BinaryOperator operator = binaryExpression.getBinaryOperator();
         Type firstType = binaryExpression.getFirstOperand().accept(this);
         Type secondType = binaryExpression.getSecondOperand().accept(this);
@@ -223,7 +223,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 return new BoolType();
         }
         if(operator == BinaryOperator.assign) {
-            boolean isFirstLvalue = this.isLvalue(binaryExpression.getFirstOperand());
+            boolean isFirstLvalue = isLvalue(binaryExpression.getFirstOperand());
             if(!isFirstLvalue) {
                 LeftSideNotLvalue exception = new LeftSideNotLvalue(binaryExpression.getLine());
                 binaryExpression.addError(exception);
@@ -231,7 +231,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             if(firstType instanceof NoType || secondType instanceof NoType) {
                 return new NoType();
             }
-            boolean isSubtype = this.doTypesMatch(secondType, firstType);
+            boolean isSubtype = doTypesMatch(secondType, firstType);
             if(isSubtype) {
                 if(isFirstLvalue)
                     return secondType;
@@ -248,7 +248,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(UnaryExpression unaryExpression) {
-        this.seenNoneLvalue = true;
+        seenNoneLvalue = true;
         Type operandType = unaryExpression.getOperand().accept(this);
         UnaryOperator operator = unaryExpression.getOperator();
         if(operator == UnaryOperator.not) {
@@ -274,16 +274,16 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(FunctionCall funcCall) {
-        this.seenNoneLvalue = true;
+        seenNoneLvalue = true;
         Type instanceType = funcCall.getInstance().accept(this);
 
-        boolean prevIsInFunctionCallStmt = this.isInFunctionCallStmt;
-        this.setIsInFunctionCallStmt(false);
+        boolean prevIsInFunctionCallStmt = isInFunctionCallStmt;
+        setIsInFunctionCallStmt(false);
         ArrayList<Type> argsTypes = new ArrayList<>();
         for(Expression arg : funcCall.getArgs()) {
             argsTypes.add(arg.accept(this));
         }
-        this.setIsInFunctionCallStmt(prevIsInFunctionCallStmt);
+        setIsInFunctionCallStmt(prevIsInFunctionCallStmt);
 
         if(!(instanceType instanceof FptrType || instanceType instanceof NoType)) {
             CallOnNoneFptrType exception = new CallOnNoneFptrType(funcCall.getLine());
@@ -300,8 +300,8 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
                 funcCall.addError(exception);
             }
-            if(this.doArraysTypesMatch(argsTypes, actualArgsTypes)) {
-                return this.getReturnType(returnType);
+            if(doArraysTypesMatch(argsTypes, actualArgsTypes)) {
+                return getReturnType(returnType);
             }
             else {
                 ArgsInFunctionCallNotMatchDefinition exception = new ArgsInFunctionCallNotMatchDefinition(funcCall.getLine());
@@ -335,9 +335,9 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     @Override
     public Type visit(ListAccessByIndex listAccessByIndex) {
         Type instanceType = listAccessByIndex.getInstance().accept(this);
-        boolean prevSeenNoneLvalue = this.seenNoneLvalue;
+        boolean prevSeenNoneLvalue = seenNoneLvalue;
         Type indexType = listAccessByIndex.getIndex().accept(this);
-        this.seenNoneLvalue = prevSeenNoneLvalue;
+        seenNoneLvalue = prevSeenNoneLvalue;
         boolean indexErrored = false;
         if(!(indexType instanceof NoType || indexType instanceof IntType)) {
             ListIndexNotInt exception = new ListIndexNotInt(listAccessByIndex.getLine());
@@ -362,7 +362,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(StructAccess structAccess) {
-//        this.seenNoneLvalue = true; // This actually is for structAccess Lvalue error
+//        seenNoneLvalue = true; // This actually is for structAccess Lvalue error
         Type instanceType = structAccess.getInstance().accept(this);
         String memberName = structAccess.getElement().getName();
         if(instanceType instanceof NoType)
@@ -381,7 +381,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             } catch (ItemNotFoundException e) {
                 try {
                     FunctionSymbolTableItem functionSymbolTableItem = (FunctionSymbolTableItem) structSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + memberName);
-                    this.seenNoneLvalue = true;
+                    seenNoneLvalue = true;
                     return functionSymbolTableItem.getReturnType();
 
                 } catch (ItemNotFoundException e1) {
@@ -419,10 +419,10 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             listAppend.addError(exception);
         }
 
-        boolean prevIsInFunctionCallStmt = this.isInFunctionCallStmt;
-        this.isInFunctionCallStmt = false;
+        boolean prevIsInFunctionCallStmt = isInFunctionCallStmt;
+        isInFunctionCallStmt = false;
         Type lat = listAppend.getListArg().accept(this);
-        this.isInFunctionCallStmt = false;
+        isInFunctionCallStmt = false;
         Type eat = listAppend.getElementArg().accept(this);
         isInFunctionCallStmt = prevIsInFunctionCallStmt;
 
@@ -444,7 +444,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(ExprInPar exprInPar) {
-        this.seenNoneLvalue = true;
+        seenNoneLvalue = true;
         for(Expression eInPar : exprInPar.getInputs()) {
             Type type = eInPar.accept(this);
             return type;
@@ -454,13 +454,13 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(IntValue intValue) {
-        this.seenNoneLvalue = true;
+        seenNoneLvalue = true;
         return new IntType();
     }
 
     @Override
     public Type visit(BoolValue boolValue) {
-        this.seenNoneLvalue = true;
+        seenNoneLvalue = true;
         return new BoolType();
     }
 }

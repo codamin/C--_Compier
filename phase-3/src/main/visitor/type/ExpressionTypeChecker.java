@@ -1,10 +1,7 @@
 package main.visitor.type;
 
 import main.ast.nodes.Node;
-import main.ast.nodes.Program;
 import main.ast.nodes.declaration.Declaration;
-import main.ast.nodes.declaration.FunctionDeclaration;
-import main.ast.nodes.declaration.MainDeclaration;
 import main.ast.nodes.declaration.struct.StructDeclaration;
 import main.ast.nodes.expression.*;
 import main.ast.nodes.expression.operators.BinaryOperator;
@@ -31,18 +28,18 @@ public class ExpressionTypeChecker extends Visitor<Type> {
     private Declaration currentFunction;
     private int typeValidationNumberOfErrors;
     private boolean seenNoneLvalue = false;
-    private boolean isInMethodCallStmt = false;
+    private boolean isInFunctionCallStmt = false;
 
     public void setCurrentFunction(Declaration currentFunction) {
         this.currentFunction = currentFunction;
     }
 
-    public void setIsInMethodCallStmt(boolean inIsMethodCallStmt) {
-        isInMethodCallStmt = inIsMethodCallStmt;
+    public void setIsInFunctionCallStmt(boolean inIsFunctionCallStmt) {
+        isInFunctionCallStmt = inIsFunctionCallStmt;
     }
 
-    boolean getIsInMethodCallStmt() {
-        return this.isInMethodCallStmt;
+    boolean getIsInFunctionCallStmt() {
+        return this.isInFunctionCallStmt;
     }
 
     public boolean isFirstSubTypeOfSecondMultiple(ArrayList<Type> first, ArrayList<Type> second) {
@@ -114,11 +111,11 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             ans += this.checkTypeValidation(elementType, node);
         }
         if(type instanceof StructType) {
-            String className = ((StructType)type).getStructName().getName();
+            String structName = ((StructType)type).getStructName().getName();
             try {
-                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + className);
-            } catch (ItemNotFoundException classNotFound) {
-                StructNotDeclared exception = new StructNotDeclared(node.getLine(), className);
+                SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + structName);
+            } catch (ItemNotFoundException e) {
+                StructNotDeclared exception = new StructNotDeclared(node.getLine(), structName);
                 node.addError(exception);
                 ans += 1;
             }
@@ -282,13 +279,13 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         this.seenNoneLvalue = true;
         Type instanceType = funcCall.getInstance().accept(this);
 
-        boolean prevIsInMethodCallStmt = this.isInMethodCallStmt;
-        this.setIsInMethodCallStmt(false);
+        boolean prevIsInFunctionCallStmt = this.isInFunctionCallStmt;
+        this.setIsInFunctionCallStmt(false);
         ArrayList<Type> argsTypes = new ArrayList<>();
         for(Expression arg : funcCall.getArgs()) {
             argsTypes.add(arg.accept(this));
         }
-        this.setIsInMethodCallStmt(prevIsInMethodCallStmt);
+        this.setIsInFunctionCallStmt(prevIsInFunctionCallStmt);
 
         if(!(instanceType instanceof FptrType || instanceType instanceof NoType)) {
             CallOnNoneFptrType exception = new CallOnNoneFptrType(funcCall.getLine());
@@ -301,7 +298,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         else {
             ArrayList<Type> actualArgsTypes = ((FptrType) instanceType).getArgsType();
             Type returnType = ((FptrType) instanceType).getReturnType();
-            if(!isInMethodCallStmt && (returnType instanceof VoidType)) {
+            if(!isInFunctionCallStmt && (returnType instanceof VoidType)) {
                 CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
                 funcCall.addError(exception);
             }
@@ -374,22 +371,22 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             return new NoType();
         else if(instanceType instanceof StructType) {
             String structName = ((StructType) instanceType).getStructName().getName();
-            SymbolTable classSymbolTable;
+            SymbolTable structSymbolTable;
             try {
-                classSymbolTable = ((StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + structName)).getStructSymbolTable();
-            } catch (ItemNotFoundException classNotFound) {
+                structSymbolTable = ((StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + structName)).getStructSymbolTable();
+            } catch (ItemNotFoundException e) {
                 return new NoType();
             }
             try {
-                VariableSymbolTableItem fieldSymbolTableItem = (VariableSymbolTableItem) classSymbolTable.getItem(VariableSymbolTableItem.START_KEY + memberName);
+                VariableSymbolTableItem fieldSymbolTableItem = (VariableSymbolTableItem) structSymbolTable.getItem(VariableSymbolTableItem.START_KEY + memberName);
                 return fieldSymbolTableItem.getType();
-            } catch (ItemNotFoundException memberNotField) {
+            } catch (ItemNotFoundException e) {
                 try {
-                    FunctionSymbolTableItem methodSymbolTableItem = (FunctionSymbolTableItem) classSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + memberName);
+                    FunctionSymbolTableItem functionSymbolTableItem = (FunctionSymbolTableItem) structSymbolTable.getItem(FunctionSymbolTableItem.START_KEY + memberName);
                     this.seenNoneLvalue = true;
-                    return methodSymbolTableItem.getReturnType();
+                    return functionSymbolTableItem.getReturnType();
 
-                } catch (ItemNotFoundException memberNotFound) {
+                } catch (ItemNotFoundException e1) {
                     StructMemberNotFound exception = new StructMemberNotFound(structAccess.getLine(), structName, memberName);
                     structAccess.addError(exception);
                     return new NoType();
@@ -419,17 +416,17 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(ListAppend listAppend) {
-        if(!isInMethodCallStmt) {
+        if(!isInFunctionCallStmt) {
             CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(listAppend.getLine());
             listAppend.addError(exception);
         }
 
-        boolean prevIsInMethodCallStmt = this.isInMethodCallStmt;
-        this.isInMethodCallStmt = false;
+        boolean prevIsInFunctionCallStmt = this.isInFunctionCallStmt;
+        this.isInFunctionCallStmt = false;
         Type lat = listAppend.getListArg().accept(this);
-        this.isInMethodCallStmt = false;
+        this.isInFunctionCallStmt = false;
         Type eat = listAppend.getElementArg().accept(this);
-        isInMethodCallStmt = prevIsInMethodCallStmt;
+        isInFunctionCallStmt = prevIsInFunctionCallStmt;
 
         if(lat instanceof NoType || eat instanceof NoType) {
             return new NoType();

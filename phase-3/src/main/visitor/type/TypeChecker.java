@@ -5,7 +5,6 @@ import main.ast.nodes.declaration.*;
 import main.ast.nodes.declaration.struct.*;
 import main.ast.nodes.expression.operators.BinaryOperator;
 import main.ast.nodes.statement.*;
-import main.ast.types.ListType;
 import main.ast.types.NoType;
 import main.ast.types.StructType;
 import main.ast.types.Type;
@@ -38,9 +37,6 @@ public class TypeChecker extends Visitor<Void> {
     @Override
     public Void visit(Program program) {
         for(StructDeclaration structDeclaration : program.getStructs()) {
-
-//            this.expressionTypeChecker.setCurrentStruct(structDeclaration);
-//            this.currentStruct = structDeclaration;
             structDeclaration.accept(this);
         }
         for(FunctionDeclaration functionDeclaration : program.getFunctions()) {
@@ -68,7 +64,7 @@ public class TypeChecker extends Visitor<Void> {
         if(retType instanceof StructType) {
             try {
                 SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + ((StructType) retType).getStructName().getName());
-            } catch (ItemNotFoundException classNotFound) {
+            } catch (ItemNotFoundException e) {
                 StructNotDeclared exception = new StructNotDeclared(functionDec.getLine(), ((StructType) retType).getStructName().getName());
                 functionDec.addError(exception);
             }
@@ -237,18 +233,18 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionCallStmt functionCallStmt) {
-        expressionTypeChecker.setIsInMethodCallStmt(true);
+        expressionTypeChecker.setIsInFunctionCallStmt(true);
         functionCallStmt.getFunctionCall().accept(expressionTypeChecker);
-        expressionTypeChecker.setIsInMethodCallStmt(false);
+        expressionTypeChecker.setIsInFunctionCallStmt(false);
         return null;
     }
 
     @Override
     public Void visit(DisplayStmt displayStmt) {
-        boolean prevIsInMethodCallStmt = expressionTypeChecker.getIsInMethodCallStmt();
-        expressionTypeChecker.setIsInMethodCallStmt(false);
+        boolean prevIsInFunctionCallStmt = expressionTypeChecker.getIsInFunctionCallStmt();
+        expressionTypeChecker.setIsInFunctionCallStmt(false);
         Type type = displayStmt.getArg().accept(expressionTypeChecker);
-        expressionTypeChecker.setIsInMethodCallStmt(prevIsInMethodCallStmt);
+        expressionTypeChecker.setIsInFunctionCallStmt(prevIsInFunctionCallStmt);
         if(!(type instanceof IntType || type instanceof BoolType || type instanceof NoType)) {
             UnsupportedTypeForDisplay exception = new UnsupportedTypeForDisplay(displayStmt.getLine());
             displayStmt.addError(exception);
@@ -306,19 +302,19 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(ListAppendStmt listAppendStmt) {
-        boolean prevIsInMethodCallStmt = expressionTypeChecker.getIsInMethodCallStmt();
-        expressionTypeChecker.setIsInMethodCallStmt(true);
+        boolean prevIsInFunctionCallStmt = expressionTypeChecker.getIsInFunctionCallStmt();
+        expressionTypeChecker.setIsInFunctionCallStmt(true);
         listAppendStmt.getListAppendExpr().accept(expressionTypeChecker);
-        expressionTypeChecker.setIsInMethodCallStmt(prevIsInMethodCallStmt);
+        expressionTypeChecker.setIsInFunctionCallStmt(prevIsInFunctionCallStmt);
         return null;
     }
 
     @Override
     public Void visit(ListSizeStmt listSizeStmt) {
-        boolean prevIsInMethodCallStmt = expressionTypeChecker.getIsInMethodCallStmt();
-        expressionTypeChecker.setIsInMethodCallStmt(true);
+        boolean prevIsInFunctionCallStmt = expressionTypeChecker.getIsInFunctionCallStmt();
+        expressionTypeChecker.setIsInFunctionCallStmt(true);
         listSizeStmt.getListSizeExpr().accept(expressionTypeChecker);
-        expressionTypeChecker.setIsInMethodCallStmt(prevIsInMethodCallStmt);
+        expressionTypeChecker.setIsInFunctionCallStmt(prevIsInFunctionCallStmt);
         return null;
     }
 }

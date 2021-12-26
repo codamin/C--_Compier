@@ -104,7 +104,7 @@ public class TypeChecker extends Visitor<Void> {
         if(numErrors > 0) {
             finalType = new NoType();
         }
-//FOR SYMBOL TABLE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
         VariableSymbolTableItem variableSymbolTableItem = new VariableSymbolTableItem(variableDec.getVarName());
         variableSymbolTableItem.setType(finalType);
         try {
@@ -175,17 +175,14 @@ public class TypeChecker extends Visitor<Void> {
         Type firstType = assignmentStmt.getLValue().accept(expressionTypeChecker);
         Type secondType = assignmentStmt.getRValue().accept(expressionTypeChecker);
 
-        boolean isFirstLvalue = expressionTypeChecker.isLvalue(assignmentStmt.getLValue());
-        if(!isFirstLvalue) {
+        if(!expressionTypeChecker.isLvalue(assignmentStmt.getLValue())) {
             LeftSideNotLvalue exception = new LeftSideNotLvalue(assignmentStmt.getLine());
             assignmentStmt.addError(exception);
         }
-
-        boolean isSubtype = expressionTypeChecker.doTypesMatch(secondType, firstType);
         if(firstType instanceof NoType) {
             return null;
         }
-        if(!isSubtype) {
+        if(!expressionTypeChecker.doTypesMatch(secondType, firstType)) {
             UnsupportedOperandType exception = new UnsupportedOperandType(assignmentStmt.getLine(), BinaryOperator.assign.name());
             assignmentStmt.addError(exception);
         }

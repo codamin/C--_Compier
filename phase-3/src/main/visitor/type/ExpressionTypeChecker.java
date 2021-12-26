@@ -239,20 +239,21 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         seenNoneLvalue = true;
         Type operandType = unaryExpression.getOperand().accept(this);
         UnaryOperator operator = unaryExpression.getOperator();
+        if(operandType instanceof NoType)
+            return new NoType();
+
         if(operator == UnaryOperator.not) {
-            if(operandType instanceof NoType)
-                return new NoType();
-            if(operandType instanceof BoolType)
-                return operandType;
+            if(operandType instanceof BoolType) {
+                return new BoolType();
+            }
             UnsupportedOperandType exception = new UnsupportedOperandType(unaryExpression.getLine(), operator.name());
             unaryExpression.addError(exception);
             return new NoType();
         }
         else if(operator == UnaryOperator.minus) {
-            if(operandType instanceof NoType)
-                return new NoType();
-            if(operandType instanceof IntType)
-                return operandType;
+            if(operandType instanceof IntType) {
+                return new IntType();
+            }
             UnsupportedOperandType exception = new UnsupportedOperandType(unaryExpression.getLine(), operator.name());
             unaryExpression.addError(exception);
             return new NoType();
@@ -273,30 +274,26 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         }
         setIsInFunctionCallStmt(prevIsInFunctionCallStmt);
 
-        if(!(instanceType instanceof FptrType || instanceType instanceof NoType)) {
+        if(instanceType instanceof NoType) {
+            return new NoType();
+        }
+        if(!(instanceType instanceof FptrType)) {
             CallOnNoneFptrType exception = new CallOnNoneFptrType(funcCall.getLine());
             funcCall.addError(exception);
             return new NoType();
         }
-        else if(instanceType instanceof NoType) {
-            return new NoType();
+
+        if(!isInFunctionCallStmt && (((FptrType) instanceType).getReturnType() instanceof VoidType)) {
+            CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
+            funcCall.addError(exception);
         }
-        else {
-            ArrayList<Type> actualArgsTypes = ((FptrType) instanceType).getArgsType();
-            Type returnType = ((FptrType) instanceType).getReturnType();
-            if(!isInFunctionCallStmt && (returnType instanceof VoidType)) {
-                CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
-                funcCall.addError(exception);
-            }
-            if(doArraysTypesMatch(argsTypes, actualArgsTypes)) {
-                return getReturnType(returnType);
-            }
-            else {
-                ArgsInFunctionCallNotMatchDefinition exception = new ArgsInFunctionCallNotMatchDefinition(funcCall.getLine());
-                funcCall.addError(exception);
-                return new NoType();
-            }
+        if(doArraysTypesMatch(argsTypes, ((FptrType) instanceType).getArgsType())) {
+            return getReturnType(((FptrType) instanceType).getReturnType());
         }
+
+        ArgsInFunctionCallNotMatchDefinition exception = new ArgsInFunctionCallNotMatchDefinition(funcCall.getLine());
+        funcCall.addError(exception);
+        return new NoType();
 
     }
 
@@ -326,26 +323,24 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         boolean prevSeenNoneLvalue = seenNoneLvalue;
         Type indexType = listAccessByIndex.getIndex().accept(this);
         seenNoneLvalue = prevSeenNoneLvalue;
-        boolean indexErrored = false;
+        boolean indexHasError = false;
         if(!(indexType instanceof NoType || indexType instanceof IntType)) {
             ListIndexNotInt exception = new ListIndexNotInt(listAccessByIndex.getLine());
             listAccessByIndex.addError(exception);
-            indexErrored = true;
+            indexHasError = true;
+        }
+        if(instanceType instanceof NoType) {
+            return new NoType();
         }
         if(instanceType instanceof ListType) {
-            Type lt = ((ListType) instanceType).getType();
-            if(indexErrored)
+            if(indexHasError)
                 return new NoType();
+            return ((ListType) instanceType).getType();
         }
-        else if(instanceType instanceof NoType) {
-            return new NoType();
-        }
-        else if(!(instanceType instanceof NoType)) {
-            AccessByIndexOnNonList exception = new AccessByIndexOnNonList(listAccessByIndex.getLine());
-            listAccessByIndex.addError(exception);
-            return new NoType();
-        }
-        return ((ListType) instanceType).getType();
+
+        AccessByIndexOnNonList exception = new AccessByIndexOnNonList(listAccessByIndex.getLine());
+        listAccessByIndex.addError(exception);
+        return new NoType();
     }
 
     @Override

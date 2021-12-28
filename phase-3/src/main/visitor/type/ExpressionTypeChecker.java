@@ -68,14 +68,14 @@ public class ExpressionTypeChecker extends Visitor<Type> {
                 return false;
             Type firstRetType = ((FptrType) first).getReturnType();
             Type secondRetType = ((FptrType) second).getReturnType();
-            if(!firstRetType.toString().equals(secondRetType.toString()))
+            if(!doTypesMatch(firstRetType, secondRetType))
                 return false;
             ArrayList<Type> firstArgsTypes = ((FptrType) first).getArgsType();
             ArrayList<Type> secondArgsTypes = ((FptrType) second).getArgsType();
             if(firstArgsTypes.size() != secondArgsTypes.size())
                 return false;
             for(int i = 0; i < firstArgsTypes.size(); i++) {
-                if(!firstArgsTypes.get(i).toString().equals(secondArgsTypes.get(i).toString()))
+                if(!doTypesMatch(firstArgsTypes.get(i), secondArgsTypes.get(i)))
                     return false;
             }
             return true;
@@ -86,8 +86,9 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             Type firstType = ((ListType)first).getType();
             Type secondType = ((ListType)second).getType();
 
-            if(firstType.toString().equals(secondType.toString()))
-                return true;
+            if(!doTypesMatch(firstType, secondType))
+                return false;
+            return true;
         }
         return false;
     }
@@ -283,16 +284,20 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             return new NoType();
         }
 
+        boolean temp = false;
         if(!isInFunctionCallStmt && (((FptrType) instanceType).getReturnType() instanceof VoidType)) {
             CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
             funcCall.addError(exception);
+            temp = true;
         }
         if(doArraysTypesMatch(argsTypes, ((FptrType) instanceType).getArgsType())) {
-            return getReturnType(((FptrType) instanceType).getReturnType());
+            if(!temp)
+                return getReturnType(((FptrType) instanceType).getReturnType());
         }
-
-        ArgsInFunctionCallNotMatchDefinition exception = new ArgsInFunctionCallNotMatchDefinition(funcCall.getLine());
-        funcCall.addError(exception);
+        else {
+            ArgsInFunctionCallNotMatchDefinition exception = new ArgsInFunctionCallNotMatchDefinition(funcCall.getLine());
+            funcCall.addError(exception);
+        }
         return new NoType();
 
     }
@@ -307,6 +312,7 @@ public class ExpressionTypeChecker extends Visitor<Type> {
             try {
                 FunctionSymbolTableItem functionSymbolTableItem =
                         (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
+                seenNoneLvalue = true;
                 return new FptrType(functionSymbolTableItem.getArgTypes(), functionSymbolTableItem.getReturnType());
 
             } catch (ItemNotFoundException e2) {
@@ -397,11 +403,6 @@ public class ExpressionTypeChecker extends Visitor<Type> {
 
     @Override
     public Type visit(ListAppend listAppend) {
-        if(!isInFunctionCallStmt) {
-            CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(listAppend.getLine());
-            listAppend.addError(exception);
-        }
-
         boolean prevIsInFunctionCallStmt = isInFunctionCallStmt;
         isInFunctionCallStmt = false;
         Type lat = listAppend.getListArg().accept(this);
@@ -419,6 +420,11 @@ public class ExpressionTypeChecker extends Visitor<Type> {
         }
         if(!doTypesMatch(eat, ((ListType)lat).getType())) {
             NewElementTypeNotMatchListType exception = new NewElementTypeNotMatchListType(listAppend.getLine());
+            listAppend.addError(exception);
+            return new NoType();
+        }
+        if(!isInFunctionCallStmt) {
+            CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(listAppend.getLine());
             listAppend.addError(exception);
             return new NoType();
         }

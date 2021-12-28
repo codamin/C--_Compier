@@ -85,11 +85,6 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(VariableDeclaration variableDec) {
-        if(isInSet || isInGet) {
-            CannotUseDefineVar exception = new CannotUseDefineVar(variableDec.getLine());
-            variableDec.addError(exception);
-        }
-
         if(variableDec.getDefaultValue() != null) {
             Type defaultValType = variableDec.getDefaultValue().accept(expressionTypeChecker);
             boolean isSubtype = expressionTypeChecker.doTypesMatch(defaultValType, variableDec.getVarType());
@@ -278,6 +273,11 @@ public class TypeChecker extends Visitor<Void> {
 
     @Override
     public Void visit(VarDecStmt varDecStmt) {
+        if(isInSet || isInGet) {
+            CannotUseDefineVar exception = new CannotUseDefineVar(varDecStmt.getLine());
+            varDecStmt.addError(exception);
+        }
+
         for (VariableDeclaration variableDeclaration : varDecStmt.getVars()) {
             variableDeclaration.accept(this);
         }

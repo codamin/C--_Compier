@@ -1,0 +1,8 @@
+struct testX begin
+    int id
+    int price
+end
+
+main() begin
+    display(2);
+end

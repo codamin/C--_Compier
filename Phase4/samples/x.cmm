@@ -1,4 +1,4 @@
-struct testX begin
+struct X begin
     int id = 3
     bool price
 end
@@ -16,9 +16,6 @@ end
 
 main() begin
     int a = 3;
-    struct testX tx;
-
-
-
-
+    struct X tx;
+    display(tx.id);
 end

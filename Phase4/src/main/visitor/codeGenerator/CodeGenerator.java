@@ -115,15 +115,12 @@ public class  CodeGenerator extends Visitor<String> {
         int count = 1;
         if(currentFunction == null && (!isInMain))
             return tempVarSlot++;
-        System.out.println("fuck1");
         if(currentFunction != null) {
-            System.out.println("fuck2");
             for (VariableDeclaration varDeclaration : currentFunction.getArgs()) {
                 if (varDeclaration.getVarName().getName().equals(identifier))
                     return count;
                 count++;
             }
-            System.out.println("fuck3");
             for(Statement stmt : ((BlockStmt) (currentFunction.getBody())).getStatements()) {
                 if(stmt instanceof VarDecStmt) {
                     for(VariableDeclaration variableDeclaration : ((VarDecStmt) (stmt)).getVars()) {
@@ -203,7 +200,6 @@ public class  CodeGenerator extends Visitor<String> {
         if(isField) {
             String className = currentStruct.getStructName().getName();
             addCommand("putfield " + className + "/" + name + " " + makeTypeSignature(type));
-            addCommand("checkcast " + varDeclaration.getVarName().getName());
         }
         else {
             addCommand("astore " + slotOf(varDeclaration.getVarName().getName()));
@@ -217,12 +213,6 @@ public class  CodeGenerator extends Visitor<String> {
             else
                 return expr.accept(this);
         }
-//        else if(type instanceof StringType) {
-//            if(isInitialization)
-//                return this.visit(new StringValue(""));
-//            else
-//                return expr.accept(this);
-//        }
         else if(type instanceof BoolType) {
             if(isInitialization)
                 return this.visit(new BoolValue(false));
@@ -248,43 +238,43 @@ public class  CodeGenerator extends Visitor<String> {
             else
                 return expr.accept(this);
         }
-//        else if(type instanceof ListType) {
-//            String commands = "";
-//            commands += "new java/util/ArrayList\n";
-//            commands += "dup\n";
-//            commands += "invokespecial java/util/ArrayList/<init>()V\n";
-//            int tempVar = slotOf("");
-//            commands += "astore " + tempVar + "\n";
-//            if(isInitialization)
-//                for(ListNameType listNameType : ((ListType) type).getElementsTypes()) {
-//                    commands += "aload " + tempVar + "\n";
-//                    commands += this.generateValue(true, null, listNameType.getType()) + "\n";
-//                    if(listNameType.getType() instanceof IntType)
-//                        commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
-//                    else if(listNameType.getType() instanceof BoolType)
-//                        commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
-//                    commands += "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z\n";
-//                    commands += "pop\n";
-//                }
-//            else
-//                for(Expression expression : ((ListValue) expr).getElements()) {
-//                    commands += "aload " + tempVar + "\n";
-//                    commands += expression.accept(this) + "\n";
-//                    Type t = expression.accept(expressionTypeChecker);
-//                    if(t instanceof IntType)
-//                        commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
-//                    else if(t instanceof BoolType)
-//                        commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
-//                    commands += "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z\n";
-//                    commands += "pop\n";
-//                }
-//            commands += "new List\n";
-//            commands += "dup\n";
-//            commands += "aload " + tempVar + "\n";
-//            commands += "invokespecial List/<init>(Ljava/util/ArrayList;)V";
-//            --(this.tempVarSlot);
-//            return commands;
-//        }
+        else if(type instanceof ListType) {
+            String commands = "";
+            commands += "new java/util/ArrayList\n";
+            commands += "dup\n";
+            commands += "invokespecial java/util/ArrayList/<init>()V\n";
+            int tempVar = slotOf("");
+            commands += "astore " + tempVar + "\n";
+            if(isInitialization)
+                for(ListNameType listNameType : ((ListType) type).getElementsTypes()) {
+                    commands += "aload " + tempVar + "\n";
+                    commands += this.generateValue(true, null, listNameType.getType()) + "\n";
+                    if(listNameType.getType() instanceof IntType)
+                        commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
+                    else if(listNameType.getType() instanceof BoolType)
+                        commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
+                    commands += "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z\n";
+                    commands += "pop\n";
+                }
+            else
+                for(Expression expression : ((ListValue) expr).getElements()) {
+                    commands += "aload " + tempVar + "\n";
+                    commands += expression.accept(this) + "\n";
+                    Type t = expression.accept(expressionTypeChecker);
+                    if(t instanceof IntType)
+                        commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
+                    else if(t instanceof BoolType)
+                        commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
+                    commands += "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z\n";
+                    commands += "pop\n";
+                }
+            commands += "new List\n";
+            commands += "dup\n";
+            commands += "aload " + tempVar + "\n";
+            commands += "invokespecial List/<init>(Ljava/util/ArrayList;)V";
+            --(this.tempVarSlot);
+            return commands;
+        }
         return null;
     }
 
@@ -790,15 +780,22 @@ public class  CodeGenerator extends Visitor<String> {
         System.out.println("Identifier is visited");
         String commands = "";
         Type type = identifier.accept(expressionTypeChecker);
-        commands += "aload " + slotOf(identifier.getName());
-        System.out.println("slot of identifier" + identifier.getName() + commands);
-        if(type instanceof IntType)
-            commands += "\ninvokevirtual java/lang/Integer/intValue()I";
-        else if(type instanceof  BoolType)
-            commands += "\ninvokevirtual java/lang/Boolean/booleanValue()Z";
+        if(type instanceof FptrType) {
+            commands += "new Fptr\n";
+            commands += "dup\n";
+            commands += "aload 0\n";
+            commands += "ldc \"" + identifier.getName() + "\"\n";
+            commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V";
+        }
+        else {
+            commands += "aload " + slotOf(identifier.getName());
+            System.out.println("slot of identifier" + identifier.getName() + commands);
+            if (type instanceof IntType)
+                commands += "\ninvokevirtual java/lang/Integer/intValue()I";
+            else if (type instanceof BoolType)
+                commands += "\ninvokevirtual java/lang/Boolean/booleanValue()Z";
+        }
         return commands;
-//        //todo
-//        return null;
     }
 
     @Override

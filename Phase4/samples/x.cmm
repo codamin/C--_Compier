@@ -1,8 +1,12 @@
 struct testX begin
-    int id
-    int price
+    int id = 3
+    bool price
+end
+
+void f() begin
+    return
 end
 
 main() begin
-    display(2);
+    int a, b, c;
 end

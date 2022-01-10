@@ -1,21 +1,13 @@
-struct X begin
-    int id = 3
-    bool price
+bool a(int ef) begin
+    display(1);
+    return true;
 end
 
-void f() begin
-    int c = 85;
-    if(c == 85) begin
-        display(85);
-    end
-    else begin
-        display(58);
-    end
-
+fptr<int -> bool> b(int d) begin
+    display(2);
+    return a;
 end
 
 main() begin
-    int a = 3;
-    struct X tx;
-    display(tx.id);
+    display(a(85));
 end

@@ -9,5 +9,6 @@ fptr<int -> bool> b(int d) begin
 end
 
 main() begin
-    display(a(85));
+    fptr<int -> bool> ap = b(5);
+    ap(5);
 end

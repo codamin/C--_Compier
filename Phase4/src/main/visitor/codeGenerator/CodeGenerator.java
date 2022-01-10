@@ -755,11 +755,39 @@ public class  CodeGenerator extends Visitor<String> {
         String commands = "";
         Type type = identifier.accept(expressionTypeChecker);
         if(type instanceof FptrType) {
-            commands += "new Fptr\n";
-            commands += "dup\n";
-            commands += "aload 0\n";
-            commands += "ldc \"" + identifier.getName() + "\"\n";
-            commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V";
+//////////////////////////////////////////////////////////////////////////
+            try {
+                VariableSymbolTableItem symbolTableItem =
+                        (VariableSymbolTableItem) SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
+                System.out.println(">>>>>>>> varTypeFtpr" + identifier.getName());
+                //            return symbolTableItem.getType();
+                commands += "new Fptr\n";
+                commands += "dup\n";
+                int fff = slotOf(symbolTableItem.getName());
+                commands += "aload " + fff + "\n";
+                System.out.println(fff);
+                commands += "ldc \"" + identifier.getName() + "\"\n";
+                commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V";
+            } catch (ItemNotFoundException e1) {
+                try {
+                    FunctionSymbolTableItem functionSymbolTableItem =
+                            (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
+                    System.out.println(">>>>>>>> funcTypeFptr" + identifier.getName());
+                    commands += "new Fptr\n";
+                    commands += "dup\n";
+                    commands += "aload 0\n";
+                    commands += "ldc \"" + identifier.getName() + "\"\n";
+                    commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V";
+                } catch (ItemNotFoundException e2) {
+                }
+            }
+//////////////////////////////////////////////////////////////////////////
+
+//            commands += "new Fptr\n";
+//            commands += "dup\n";
+//            commands += "aload 0\n";
+//            commands += "ldc \"" + identifier.getName() + "\"\n";
+//            commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V";
         }
         else {
             commands += "aload " + slotOf(identifier.getName());
@@ -807,6 +835,7 @@ public class  CodeGenerator extends Visitor<String> {
             commands += "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z\n";
             commands += "pop\n";
         }
+
         commands += functionCall.getInstance().accept(this) + "\n";
         commands += "aload " + tempVar + "\n";
         commands += "invokevirtual Fptr/invoke(Ljava/util/ArrayList;)Ljava/lang/Object;\n";
@@ -836,7 +865,7 @@ public class  CodeGenerator extends Visitor<String> {
         System.out.println("ListAppend is visited");
         String commands = "";
         commands += listAppend.getListArg().accept(this) + "\n";
-//        listAppend.getElementArg().accept(expressionTypeChecker);
+        commands += listAppend.getElementArg().accept(this) + "\n";
 //        commands += "aload " + listAppend.getListArg() + "\n";
 //            commands += expression.accept(this) + "\n";
             Type elementArgType = listAppend.getElementArg().accept(expressionTypeChecker);

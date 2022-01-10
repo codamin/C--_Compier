@@ -4,9 +4,21 @@ struct testX begin
 end
 
 void f() begin
-    return
+    int c = 85;
+    if(c == 85) begin
+        display(85);
+    end
+    else begin
+        display(58);
+    end
+
 end
 
 main() begin
-    int a, b, c;
+    int a = 3;
+    struct testX tx;
+
+
+
+
 end

@@ -1,31 +1,14 @@
-bool c(fptr<int -> bool> ap) begin
-    display(30);
-    if(ap(1) == false) begin
-        display(85);
-    end
-    else begin
-        display(8585);
-    end
-    return false;
-end
-
-bool a(int ef) begin
-    display(1);
-    return true;
-end
-
-fptr<int -> bool> b(int d) begin
-    display(2);
-    return a;
+struct Myclass begin
+    int field1 = 2;
+    bool field2 = false;
 end
 
 main() begin
-    fptr<int -> bool> ap = b(5);
-    c(ap);
+    list #struct Myclass li;
+    struct Myclass i1;
+    struct Myclass i2;
+    append(li, i1);
+    append(li, i2);
+    li[0].field1 = 85;
+    display(li[0].field1);
 end
-
-/*
-b: 2
-c: 30
-a: 1
-*/

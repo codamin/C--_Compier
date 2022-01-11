@@ -1,5 +1,6 @@
 package main.visitor.codeGenerator;
 
+import jdk.nashorn.internal.ir.Block;
 import main.ast.nodes.*;
 import main.ast.nodes.declaration.*;
 import main.ast.nodes.declaration.struct.*;
@@ -19,6 +20,7 @@ import main.visitor.Visitor;
 import main.visitor.type.ExpressionTypeChecker;
 import main.visitor.type.TypeChecker;
 
+import javax.swing.plaf.nimbus.State;
 import java.io.*;
 import java.util.*;
 
@@ -132,7 +134,19 @@ public class  CodeGenerator extends Visitor<String> {
             }
         }
         else if(isInMain) {
-            for(Statement stmt : ((BlockStmt) (mainDeclaration.getBody())).getStatements()) {
+            if(mainDeclaration.getBody() instanceof BlockStmt) {
+                for(Statement stmt : ((BlockStmt) (mainDeclaration.getBody())).getStatements()) {
+                    if(stmt instanceof VarDecStmt) {
+                        for(VariableDeclaration variableDeclaration : ((VarDecStmt) (stmt)).getVars()) {
+                            if (variableDeclaration.getVarName().getName().equals(identifier))
+                                return count;
+                            count++;
+                        }
+                    }
+                }
+            }
+            else {
+                Statement stmt = mainDeclaration.getBody();
                 if(stmt instanceof VarDecStmt) {
                     for(VariableDeclaration variableDeclaration : ((VarDecStmt) (stmt)).getVars()) {
                         if (variableDeclaration.getVarName().getName().equals(identifier))
@@ -141,6 +155,7 @@ public class  CodeGenerator extends Visitor<String> {
                     }
                 }
             }
+
         }
         return count + (tempVarSlot++);
     }
@@ -469,7 +484,7 @@ public class  CodeGenerator extends Visitor<String> {
 
         boolean prevSeenReturn = this.seenReturn;
         seenReturn = false;
-        conditionalStmt.getThenBody().accept(this.typeChecker);
+//        conditionalStmt.getThenBody().accept(this.typeChecker);
         if(!seenReturn)
             addCommand("goto " + exitLabel);
         this.seenReturn = prevSeenReturn;
@@ -751,7 +766,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(Identifier identifier){
-        System.out.println("Identifier <" + identifier.getName() + "> is visited");
+//        System.out.println("Identifier <" + identifier.getName() + "> is visited");
         String commands = "";
         Type type = identifier.accept(expressionTypeChecker);
         if(type instanceof FptrType) {
@@ -790,7 +805,7 @@ public class  CodeGenerator extends Visitor<String> {
 //            commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V";
         }
         else {
-            commands += "aload " + slotOf(identifier.getName());
+            commands += "aload " + slotOf(identifier.getName()) + "\n";
             if (type instanceof IntType)
                 commands += "\ninvokevirtual java/lang/Integer/intValue()I";
             else if (type instanceof BoolType)
@@ -855,8 +870,8 @@ public class  CodeGenerator extends Visitor<String> {
         System.out.println("ListSize is visited");
         String commands = "";
         commands += listSize.getArg().accept(this);
-//        commands += "getfield List/elements Ljava/util/ArrayList;";
-        commands += "invokevirtual java/util/ArrayList/size()I";
+        commands += "invokevirtual List/getSize()I\n";
+        System.out.println(commands);
         return commands;
     }
 
@@ -866,15 +881,14 @@ public class  CodeGenerator extends Visitor<String> {
         String commands = "";
         commands += listAppend.getListArg().accept(this) + "\n";
         commands += listAppend.getElementArg().accept(this) + "\n";
-//        commands += "aload " + listAppend.getListArg() + "\n";
-//            commands += expression.accept(this) + "\n";
-            Type elementArgType = listAppend.getElementArg().accept(expressionTypeChecker);
-            if(elementArgType instanceof IntType)
-                commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
-            else if(elementArgType instanceof BoolType)
-                commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
-            commands += "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z\n";
-            commands += "pop\n";
+        Type elementArgType = listAppend.getElementArg().accept(expressionTypeChecker);
+        if(elementArgType instanceof IntType)
+            commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
+        else if(elementArgType instanceof BoolType)
+            commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
+        commands += "invokevirtual List/addElement(Ljava/lang/Object;)V\n";
+
+//        commands += "pop\n";
         return commands;
     }
 

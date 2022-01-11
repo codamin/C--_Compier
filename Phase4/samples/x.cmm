@@ -1,7 +1,15 @@
 void f() begin
- int a = 1;
+    int a = 1;
+    return
 end
 
 main() begin
-    display(1);
+    list #int li;
+    append(li, 1);
+    int i = 0;
+    while(i < 1000) begin
+        size(li)
+        i = i + 1
+    end
+    display(size(li));
 end

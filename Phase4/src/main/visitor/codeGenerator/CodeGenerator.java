@@ -285,7 +285,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(Program program) {
-        System.out.println("Program is visited");
+//        System.out.println("Program is visited");
         prepareOutputFolder();
 
         for(StructDeclaration structDeclaration : program.getStructs()){
@@ -329,7 +329,7 @@ public class  CodeGenerator extends Visitor<String> {
     @Override
     public String visit(StructDeclaration structDeclaration) {
         // Symbol Table : Given!
-        System.out.println("StructDeclaration is visited");
+//        System.out.println("StructDeclaration is visited");
         currentStruct = structDeclaration;
         try{
             String structKey = StructSymbolTableItem.START_KEY + structDeclaration.getStructName().getName();
@@ -354,7 +354,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(FunctionDeclaration functionDeclaration) {
-        System.out.println("FunctionDeclaration is visited");
+//        System.out.println("FunctionDeclaration is visited");
         currentFunction = functionDeclaration;
         // Symbol Table : Given!
         try{
@@ -388,7 +388,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(MainDeclaration mainDeclaration) {
-        System.out.println("MainDeclaration is visited");
+//        System.out.println("MainDeclaration is visited");
         this.isInMain = true;
         this.mainDeclaration = mainDeclaration;
         // Symbol Table Stuff : Given!
@@ -416,7 +416,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(VariableDeclaration variableDeclaration) {
-        System.out.println("VariableDeclaration is visited");
+//        System.out.println("VariableDeclaration is visited");
         // Add struct vars to class fields
         String commands = "";
         if(currentStruct != null) {
@@ -432,14 +432,14 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(SetGetVarDeclaration setGetVarDeclaration) {
-        System.out.println("SetGetVarDeclaration is visited");
+//        System.out.println("SetGetVarDeclaration is visited");
 
         return null;
     }
 
     @Override
     public String visit(AssignmentStmt assignmentStmt) {
-        System.out.println("AssignmentStmt is visited");
+//        System.out.println("AssignmentStmt is visited");
         addCommand(this.visit(new BinaryExpression(assignmentStmt.getLValue(), assignmentStmt.getRValue(), BinaryOperator.assign)));
         addCommand("pop");
         return null;
@@ -447,7 +447,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(BlockStmt blockStmt) {
-        System.out.println("BlockStmt is visited");
+//        System.out.println("BlockStmt is visited");
         for (Statement statement: blockStmt.getStatements())
             statement.accept(this);
         return null;
@@ -455,7 +455,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(ConditionalStmt conditionalStmt) {
-        System.out.println("ConditionalStmt is visited");
+//        System.out.println("ConditionalStmt is visited");
 
         // Define Labels
         String label_else = generateNewLabel();
@@ -487,7 +487,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(FunctionCallStmt functionCallStmt) {
-        System.out.println("FunctionCallStmt is visited");
+//        System.out.println("FunctionCallStmt is visited");
         expressionTypeChecker.setInFunctionCallStmt(true);
         addCommand(functionCallStmt.getFunctionCall().accept(this));
         expressionTypeChecker.setInFunctionCallStmt(false);
@@ -497,8 +497,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(DisplayStmt displayStmt) {
-        System.out.println("DisplayStmt is visited");
-
+//        System.out.println("DisplayStmt is visited");
         addCommand("getstatic java/lang/System/out Ljava/io/PrintStream;");
         Type argType = displayStmt.getArg().accept(expressionTypeChecker);
         String commandsOfArg = displayStmt.getArg().accept(this);
@@ -513,7 +512,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(ReturnStmt returnStmt) {
-        System.out.println("ReturnStmt is visited");
+//        System.out.println("ReturnStmt is visited");
         seenReturn = true;
 
         // Perfect Don't Touch
@@ -538,7 +537,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(LoopStmt loopStmt) {
-        System.out.println("LoopStmt is visited");
+//        System.out.println("LoopStmt is visited");
         String loopStartLabel = generateNewLabel();
         String loopExitLabel = generateNewLabel();
         if(loopStmt.getIsDoWhile()) {
@@ -557,7 +556,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(VarDecStmt varDecStmt) {
-        System.out.println("VarDecStmt is visited");
+//        System.out.println("VarDecStmt is visited");
         for(VariableDeclaration variableDeclaration : varDecStmt.getVars()) {
             variableDeclaration.accept(this);
         }
@@ -566,7 +565,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(ListAppendStmt listAppendStmt) {
-        System.out.println("ListAppendStmt is visited");
+//        System.out.println("ListAppendStmt is visited");
         addCommand(listAppendStmt.getListAppendExpr().accept(this));
 //        addCommand("pop");
         return null;
@@ -574,7 +573,7 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(ListSizeStmt listSizeStmt) {
-        System.out.println("ListSizeStmt is visited");
+//        System.out.println("ListSizeStmt is visited");
         addCommand(listSizeStmt.getListSizeExpr().accept(this));
         addCommand("pop");
         return null;
@@ -582,10 +581,11 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(BinaryExpression binaryExpression) {
-        System.out.println("BinaryExpression is visited");
+//        System.out.println("BinaryExpression is visited");
         BinaryOperator operator = binaryExpression.getBinaryOperator();
         String commands = "";
-        if(!((operator == BinaryOperator.and) || (operator == BinaryOperator.or) || (operator == BinaryOperator.assign))) {
+        if(!((operator == BinaryOperator.and) || (operator == BinaryOperator.or) ||
+                (operator == BinaryOperator.assign))) {
             commands += binaryExpression.getFirstOperand().accept(this) + "\n";
             commands += binaryExpression.getSecondOperand().accept(this) + "\n";
         }
@@ -601,12 +601,8 @@ public class  CodeGenerator extends Visitor<String> {
             String falseLabel = generateNewLabel();
             String exitLabel = generateNewLabel();
             String command = (operator == BinaryOperator.gt) ? "if_icmple " : "if_icmpge ";
-            commands += command + falseLabel + "\n";
-            commands += "ldc 1" + "\n";
-            commands += "goto " + exitLabel + "\n";
-            commands += falseLabel + ":\n";
-            commands += "ldc 0\n";
-            commands += exitLabel + ":";
+            commands += command + falseLabel + "\n" + "ldc 1" + "\n";
+            commands += "goto " + exitLabel + "\n" + falseLabel + ":\n" + "ldc 0\n" + exitLabel + ":";
         }
         else if((operator == BinaryOperator.eq)) {
             Type type = binaryExpression.getFirstOperand().accept(expressionTypeChecker);
@@ -617,105 +613,48 @@ public class  CodeGenerator extends Visitor<String> {
                 compareCommand += (operator == BinaryOperator.eq) ? "if_icmpne " : "if_icmpeq ";
             else
                 compareCommand += (operator == BinaryOperator.eq) ? "if_acmpne " : "if_acmpeq ";
-            commands += compareCommand + falseLabel + "\n";
-            commands += "ldc 1" + "\n";
-            commands += "goto " + exitLabel + "\n";
-            commands += falseLabel + ":\n";
-            commands += "ldc 0\n";
-            commands += exitLabel + ":";
+            commands += compareCommand + falseLabel + "\n" + "ldc 1" + "\n";
+            commands += "goto " + exitLabel + "\n" + falseLabel + ":\n" + "ldc 0\n" + exitLabel + ":";
         }
         else if(operator == BinaryOperator.and) {
             String falseLabel = generateNewLabel();
             String exitLabel = generateNewLabel();
-            commands += binaryExpression.getFirstOperand().accept(this) + "\n";
-            commands += "ifeq " + falseLabel + "\n";
-            commands += binaryExpression.getSecondOperand().accept(this) + "\n";
-            commands += "ifeq " + falseLabel + "\n";
-            commands += "ldc 1\n";
-            commands += "goto " + exitLabel + "\n";
-            commands += falseLabel + ":\n";
-            commands += "ldc 0\n";
-            commands += exitLabel + ":";
+            commands += binaryExpression.getFirstOperand().accept(this) + "\n" + "ifeq " + falseLabel + "\n";
+            commands += binaryExpression.getSecondOperand().accept(this) + "\n" + "ifeq " + falseLabel + "\n" + "ldc 1\n";
+            commands += "goto " + exitLabel + "\n" + falseLabel + ":\n" + "ldc 0\n" + exitLabel + ":";
 
         }
         else if(operator == BinaryOperator.or) {
             String falseLabel = generateNewLabel();
             String exitLabel = generateNewLabel();
             commands += binaryExpression.getFirstOperand().accept(this) + "\n";
-            commands += "ifne " + falseLabel + "\n";
-            commands += binaryExpression.getSecondOperand().accept(this) + "\n";
-            commands += "ifne " + falseLabel + "\n";
-            commands += "ldc 0\n";
-            commands += "goto " + exitLabel + "\n";
-            commands += falseLabel + ":\n";
-            commands += "ldc 1\n";
-            commands += exitLabel + ":";
+            commands += "ifne " + falseLabel + "\n" + binaryExpression.getSecondOperand().accept(this) + "\n";
+            commands += "ifne " + falseLabel + "\n" + "ldc 0\n" + "goto " + exitLabel + "\n" + falseLabel + ":\n" + "ldc 1\n" + exitLabel + ":";
         }
         else if(operator == BinaryOperator.assign) {
             Type firstType = binaryExpression.getFirstOperand().accept(expressionTypeChecker);
             String secondCommands = binaryExpression.getSecondOperand().accept(this);
             if(firstType instanceof ListType) {
-                secondCommands = "new List" + "\n";
-                secondCommands += "dup\n";
+                secondCommands = "new List" + "\n" + "dup\n";
                 secondCommands += binaryExpression.getSecondOperand().accept(this) + "\n";
                 secondCommands += "invokespecial List/<init>(LList;)V";
             }
             if(binaryExpression.getFirstOperand() instanceof Identifier) {
-                System.out.println("holy shitiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii " + ((Identifier) binaryExpression.getFirstOperand()).getName());
-                commands += secondCommands + "\n";
-                commands += "dup\n";
-                commands += castIntegerBoolean(firstType);
-//                if(firstType instanceof IntType)
-//                    commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
-//                else if(firstType instanceof BoolType)
-//                    commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
+                commands += secondCommands + "\n" + "dup\n" + castIntegerBoolean(firstType);
                 int varSlot = slotOf(((Identifier) binaryExpression.getFirstOperand()).getName());
                 commands += "astore " + varSlot;
             }
             else if(binaryExpression.getFirstOperand() instanceof ListAccessByIndex) {
-                commands += ((ListAccessByIndex) binaryExpression.getFirstOperand()).getInstance().accept(this) + "\n";
-                commands += ((ListAccessByIndex) binaryExpression.getFirstOperand()).getIndex().accept(this) + "\n";
-                commands += secondCommands + "\n";
-                commands += "dup_x2\n";
-                commands += castIntegerBoolean(firstType);
-//                if(firstType instanceof IntType)
-//                    commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
-//                else if(firstType instanceof BoolType)
-//                    commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
-                commands += "invokevirtual List/setElement(ILjava/lang/Object;)V";
+                commands += ((ListAccessByIndex) binaryExpression.getFirstOperand()).getInstance().accept(this) + "\n" + ((ListAccessByIndex) binaryExpression.getFirstOperand()).getIndex().accept(this) + "\n";
+                commands += secondCommands + "\n" + "dup_x2\n" + castIntegerBoolean(firstType) + "invokevirtual List/setElement(ILjava/lang/Object;)V";
             }
             else if(binaryExpression.getFirstOperand() instanceof StructAccess) {
                 Expression instance = ((StructAccess) binaryExpression.getFirstOperand()).getInstance();
                 Type memberType = binaryExpression.getFirstOperand().accept(expressionTypeChecker);
                 String memberName = ((StructAccess) binaryExpression.getFirstOperand()).getElement().getName();
                 Type instanceType = instance.accept(expressionTypeChecker);
-//                if(instanceType instanceof ListType) {
-//                    int index = 0;
-//                    for(int i = 0; i < ((ListType) instanceType).getElementsTypes().size(); i++)
-//                        if(((ListType) instanceType).getElementsTypes().get(i).getName().getName().equals(memberName))
-//                            index = i;
-//                    commands += instance.accept(this) + "\n";
-//                    commands += "ldc " + index + "\n";
-//                    commands += secondCommands + "\n";
-//                    commands += "dup_x2\n";
-//                    if(firstType instanceof IntType)
-//                        commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
-//                    else if(firstType instanceof BoolType)
-//                        commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
-//                    commands += "invokevirtual List/setElement(ILjava/lang/Object;)V";
-//                }
-//                if(instanceType instanceof StructType) {
                 String className = ((StructType) instanceType).getStructName().getName();
-                commands += instance.accept(this) + "\n";
-                commands += secondCommands + "\n";
-                commands += "dup_x1\n";
-                commands += castIntegerBoolean(firstType);
-//                if(firstType instanceof IntType)
-//                    commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
-//                else if(firstType instanceof BoolType)
-//                    commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
-                commands += "putfield " + className + "/" + memberName + " " + getSignatureString(memberType);
-//                }
+                commands += instance.accept(this) + "\n" + secondCommands + "\n" + "dup_x1\n" + castIntegerBoolean(firstType) + "putfield " + className + "/" + memberName + " " + getSignatureString(memberType);
             }
         }
         return commands;
@@ -723,33 +662,27 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(UnaryExpression unaryExpression){
-        System.out.println("UnaryExpression is visited");
+//        System.out.println("UnaryExpression is visited");
 
         return null;
     }
 
     @Override
     public String visit(StructAccess structAccess){
-        System.out.println("StructAccess is visited");
+//        System.out.println("StructAccess is visited");
         Type memberType = structAccess.accept(expressionTypeChecker);
         Type instanceType = structAccess.getInstance().accept(expressionTypeChecker);
         String memberName = structAccess.getElement().getName();
         String commands = "";
         if(instanceType instanceof StructType) {
-            String className = ((StructType) instanceType).getStructName().getName();
-
+            String structName = ((StructType) instanceType).getStructName().getName();
             try {
-                SymbolTable classSymbolTable = ((StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + className)).getStructSymbolTable();
+                SymbolTable structSymbolTable = ((StructSymbolTableItem) SymbolTable.root.getItem(StructSymbolTableItem.START_KEY + structName)).getStructSymbolTable();
                 try {
-                    classSymbolTable.getItem(VariableSymbolTableItem.START_KEY + memberName);
-                    commands += structAccess.getInstance().accept(this) + "\n";
-                    commands += "getfield " + className + "/" + memberName + " " + getSignatureString(memberType);
-                    commands += castIntBool(memberType);
-                } catch (ItemNotFoundException memberIsMethod) {
-
-                }
-            } catch (ItemNotFoundException classNotFound) {
-            }
+                    structSymbolTable.getItem(VariableSymbolTableItem.START_KEY + memberName);
+                    commands += structAccess.getInstance().accept(this) + "\n" + "getfield " + structName + "/" + memberName + " " + getSignatureString(memberType) + castIntBool(memberType);
+                } catch (ItemNotFoundException memberIsMethod) {}
+            } catch (ItemNotFoundException classNotFound) {}
         }
         return commands;
     }
@@ -792,23 +725,17 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(ListAccessByIndex listAccessByIndex){
-        System.out.println("ListAccessByIndex is visited");
+//        System.out.println("ListAccessByIndex is visited");
         String commands = "";
-        commands += listAccessByIndex.getInstance().accept(this) + "\n";
-        commands += listAccessByIndex.getIndex().accept(this) + "\n";
+        commands += listAccessByIndex.getInstance().accept(this) + "\n" + listAccessByIndex.getIndex().accept(this) + "\n";
         Type type = listAccessByIndex.accept(expressionTypeChecker);
-        commands += "invokevirtual List/getElement(I)Ljava/lang/Object;\n";
-        commands += "checkcast " + getClassType(type);
-        if(type instanceof IntType)
-            commands += "\ninvokevirtual java/lang/Integer/intValue()I";
-        else if(type instanceof BoolType)
-            commands += "\ninvokevirtual java/lang/Boolean/booleanValue()Z";
+        commands += "invokevirtual List/getElement(I)Ljava/lang/Object;\n" + "checkcast " + getClassType(type) + castIntBool(type);
         return commands;
     }
 
     @Override
     public String visit(FunctionCall functionCall){
-        System.out.println("FunctionCall is visited");
+//        System.out.println("FunctionCall is visited");
 
         // Create Empty ArrayList
         String commands = "";
@@ -843,17 +770,16 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(ListSize listSize){
-        System.out.println("ListSize is visited");
+//        System.out.println("ListSize is visited");
         String commands = "";
         commands += listSize.getArg().accept(this);
         commands += "invokevirtual List/getSize()I\n";
-        System.out.println(commands);
         return commands;
     }
 
     @Override
     public String visit(ListAppend listAppend) {
-        System.out.println("ListAppend is visited");
+//        System.out.println("ListAppend is visited");
         String commands = "";
         commands += listAppend.getListArg().accept(this) + "\n";
         commands += listAppend.getElementArg().accept(this) + "\n";
@@ -867,20 +793,20 @@ public class  CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(IntValue intValue) {
-        System.out.println("IntValue is visited");
+//        System.out.println("IntValue is visited");
         return "ldc " + intValue.getConstant();
     }
 
     @Override
     public String visit(BoolValue boolValue) {
-        System.out.println("BoolValue is visited");
+//        System.out.println("BoolValue is visited");
         int boolIntVal = (boolValue.getConstant()) ? 1 : 0;
         return "ldc " + boolIntVal;
     }
 
     @Override
     public String visit(ExprInPar exprInPar) {
-        System.out.println("ExprInPar is visited");
+//        System.out.println("ExprInPar is visited");
         return exprInPar.getInputs().get(0).accept(this);
     }
 }

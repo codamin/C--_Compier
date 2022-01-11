@@ -1,15 +1,20 @@
-void f() begin
-    int a = 1;
-    return
-end
-
 main() begin
-    list #int li;
-    append(li, 1);
-    int i = 0;
-    while(i < 1000) begin
-        size(li)
-        i = i + 1
-    end
-    display(size(li));
+    int a, b, c, d, e, f, g, h;
+    a = 5;
+    b = 8 + 5 + 4;
+    c = a * b
+    display(c)
+    bool i, j, k, l, m, n;
+    i = true;
+    j = (a == b)
+    k = (c == 85)
+    l = false;
+    m = i | j;
+    n = i & j;
+    display(m);
+    display(n);
+    m = i | k;
+    n = j & m;
+    display(m);
+    display(n);
 end

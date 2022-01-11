@@ -37,8 +37,6 @@ public class  CodeGenerator extends Visitor<String> {
     private int labelCounter = 0;
     private boolean seenReturn = false;
 
-
-
     private void copyFile(String toBeCopied, String toBePasted) {
         try {
             File readingFile = new File(toBeCopied);
@@ -186,7 +184,6 @@ public class  CodeGenerator extends Visitor<String> {
         return "";
     }
 
-
     private void initializeVar(VariableDeclaration varDeclaration, boolean isField) {
         Type type = varDeclaration.getVarType();
         String name = varDeclaration.getVarName().getName();
@@ -267,7 +264,6 @@ public class  CodeGenerator extends Visitor<String> {
         }
         return null;
     }
-
 
     @Override
     public String visit(Program program) {
@@ -449,12 +445,12 @@ public class  CodeGenerator extends Visitor<String> {
         return null;
     }
 
-//    @Override
-//    public String visit(SetGetVarDeclaration setGetVarDeclaration) {
-//        System.out.println("SetGetVarDeclaration is visited");
-//
-//        return null;
-//    }
+    @Override
+    public String visit(SetGetVarDeclaration setGetVarDeclaration) {
+        System.out.println("SetGetVarDeclaration is visited");
+
+        return null;
+    }
 
     @Override
     public String visit(AssignmentStmt assignmentStmt) {
@@ -672,6 +668,7 @@ public class  CodeGenerator extends Visitor<String> {
                 secondCommands += "invokespecial List/<init>(LList;)V";
             }
             if(binaryExpression.getFirstOperand() instanceof Identifier) {
+                System.out.println("holy shitiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii " + ((Identifier) binaryExpression.getFirstOperand()).getName());
                 commands += secondCommands + "\n";
                 commands += "dup\n";
                 if(firstType instanceof IntType)
@@ -728,12 +725,12 @@ public class  CodeGenerator extends Visitor<String> {
         return commands;
     }
 
-//    @Override
-//    public String visit(UnaryExpression unaryExpression){
-//        System.out.println("UnaryExpression is visited");
-//
-//        return null;
-//    }
+    @Override
+    public String visit(UnaryExpression unaryExpression){
+        System.out.println("UnaryExpression is visited");
+
+        return null;
+    }
 
     @Override
     public String visit(StructAccess structAccess){

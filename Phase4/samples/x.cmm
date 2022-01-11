@@ -4,11 +4,15 @@ struct Myclass begin
 end
 
 main() begin
-    list #struct Myclass li;
-    struct Myclass i1;
-    struct Myclass i2;
-    append(li, i1);
-    append(li, i2);
-    li[0].field1 = 85;
-    display(li[0].field1);
+    list #int l1;
+    list #int l2;
+
+    append(l1, 1);
+    append(l1, 2);
+
+    l2 = l1;
+    l1[0] = 3;
+
+    display(l1[0])
+    display(l2[0])
 end

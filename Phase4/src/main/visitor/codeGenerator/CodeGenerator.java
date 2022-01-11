@@ -761,13 +761,13 @@ public class  CodeGenerator extends Visitor<String> {
                         (VariableSymbolTableItem) SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
                 System.out.println(">>>>>>>> varTypeFtpr" + identifier.getName());
                 //            return symbolTableItem.getType();
-                commands += "new Fptr\n";
-                commands += "dup\n";
+//                commands += "new Fptr\n";
+//                commands += "dup\n";
                 int fff = slotOf(symbolTableItem.getName());
                 commands += "aload " + fff + "\n";
-                System.out.println(fff);
-                commands += "ldc \"" + identifier.getName() + "\"\n";
-                commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V";
+//                System.out.println(fff);
+//                commands += "ldc \"" + identifier.getName() + "\"\n";
+//                commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V";
             } catch (ItemNotFoundException e1) {
                 try {
                     FunctionSymbolTableItem functionSymbolTableItem =

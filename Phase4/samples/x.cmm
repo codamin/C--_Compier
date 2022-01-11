@@ -1,18 +1,7 @@
-struct Myclass begin
-    int field1 = 2;
-    bool field2 = false;
+void f() begin
+ int a = 1;
 end
 
 main() begin
-    list #int l1;
-    list #int l2;
-
-    append(l1, 1);
-    append(l1, 2);
-
-    l2 = l1;
-    l1[0] = 3;
-
-    display(l1[0])
-    display(l2[0])
+    display(1);
 end

@@ -309,8 +309,15 @@ public class  CodeGenerator extends Visitor<String> {
         addCommand("aload 0");
         addCommand("invokespecial java/lang/Object/<init>()V");
         if(currentStruct != null) {
-            for (Statement statement : ((BlockStmt) currentStruct.getBody()).getStatements()) {
-                for (VariableDeclaration variableDeclaration : ((VarDecStmt) (statement)).getVars()) {
+            if(currentStruct.getBody() instanceof BlockStmt) {
+                for (Statement statement : ((BlockStmt) currentStruct.getBody()).getStatements()) {
+                    for (VariableDeclaration variableDeclaration : ((VarDecStmt) (statement)).getVars()) {
+                        this.setInitValue(variableDeclaration, true);
+                    }
+                }
+            }
+            else {
+                for (VariableDeclaration variableDeclaration : ((VarDecStmt) (currentStruct.getBody())).getVars()) {
                     this.setInitValue(variableDeclaration, true);
                 }
             }
@@ -654,7 +661,12 @@ public class  CodeGenerator extends Visitor<String> {
                 String memberName = ((StructAccess) binaryExpression.getFirstOperand()).getElement().getName();
                 Type instanceType = instance.accept(expressionTypeChecker);
                 String className = ((StructType) instanceType).getStructName().getName();
-                commands += instance.accept(this) + "\n" + secondCommands + "\n" + "dup_x1\n" + castIntegerBoolean(firstType) + "putfield " + className + "/" + memberName + " " + getSignatureString(memberType);
+                commands +=
+                        instance.accept(this) + "\n"
+                        + secondCommands + "\n" +
+                        "dup_x1\n" +
+                                castIntegerBoolean(firstType)
+                        + "putfield " + className + "/" + memberName + " " + getSignatureString(memberType);
             }
         }
         return commands;
@@ -748,8 +760,14 @@ public class  CodeGenerator extends Visitor<String> {
         // Visit and Add args to the arraylist
         for(Expression arg : functionCall.getArgs()) {
             commands += "aload " + tempVar + "\n";
+            if(arg.accept(expressionTypeChecker) instanceof ListType) {
+                commands += "new List" + "\ndup\n";
+            }
             commands += arg.accept(this) + "\n";
             commands += castIntegerBoolean(arg.accept(expressionTypeChecker));
+            if(arg.accept(expressionTypeChecker) instanceof ListType) {
+                commands += "invokespecial List/<init>(LList;)V" + "\n";
+            }
             commands += "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z\n";
             commands += "pop\n";
         }
@@ -760,9 +778,10 @@ public class  CodeGenerator extends Visitor<String> {
         commands += "invokevirtual Fptr/invoke(Ljava/util/ArrayList;)Ljava/lang/Object;\n";
 
         Type type = functionCall.accept(expressionTypeChecker);
-        if(!(type instanceof VoidType))
-            commands += "\n" + "checkcast " + getClassType(type);
 
+        if(!(type instanceof VoidType || type instanceof NoType)) {
+            commands += "\n" + "checkcast " + getClassType(type) + "\n";
+        }
         commands += castIntBool(type);
         this.tempSlot = this.tempSlot - 1;
         return commands;

@@ -1,20 +1,23 @@
+
+
+list #int f1(list #int a) begin
+    display(size(a));
+    f2(a);
+    return a;
+end
+
+void f2(list #int a) begin
+    int list_size;
+    append(a, 4);
+    list_size = size(a);
+    display(list_size);
+end
+
 main() begin
-    int a, b, c, d, e, f, g, h;
-    a = 5;
-    b = 8 + 5 + 4;
-    c = a * b
-    display(c)
-    bool i, j, k, l, m, n;
-    i = true;
-    j = (a == b)
-    k = (c == 85)
-    l = false;
-    m = i | j;
-    n = i & j;
-    display(m);
-    display(n);
-    m = i | k;
-    n = j & m;
-    display(m);
-    display(n);
+    list #int my_list;
+    append(my_list, 1);
+    append(my_list, 2);
+    append(my_list, 3);
+
+    display(size(f1(my_list)));
 end
